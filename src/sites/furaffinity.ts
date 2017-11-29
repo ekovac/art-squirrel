@@ -1,5 +1,5 @@
-import {Site, CommonSiteConfig, SubmissionMetadata, Submission, Fetchable, fetch} from '../sites';
-import * as Cheerio from 'cheerio';
+import {Site, CommonSiteConfig, SubmissionMetadata, Submission, Fetchable} from '../sites';
+import * as cheerio from 'cheerio';
 import * as request from 'request';
 import * as requestPromise from 'request-promise-native';
 
@@ -27,16 +27,22 @@ class FuraffinityContext {
     }
 }
 
-class FuraffinitySubmission implements Submission, Fetchable {
+abstract class FuraffinityFetchable extends Fetchable {
+    readonly context: FuraffinityContext;
+    url: string;
+    get headers(): request.Headers {
+        return this.context.headers;
+    }
+}
+
+class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
     private root: Cheerio;
     constructor(readonly context: FuraffinityContext, readonly id: string) {
+        super();
     }
 
     get url(): string {
         return `${BASE_URL}/view/${this.id}`;
-    }
-    get headers(): request.Headers {
-        return this.context.headers;
     }
 
     get metadata(): Promise<SubmissionMetadata> {
@@ -48,32 +54,29 @@ class FuraffinitySubmission implements Submission, Fetchable {
     }
 }
 
-class FuraffinityFavoritesPage implements Fetchable {
-    private root: Cheerio;
+class FuraffinityFavoritesPage extends FuraffinityFetchable {
     constructor(
-        private readonly context: FuraffinityContext,
-        private readonly pageNumber: number
+        readonly context: FuraffinityContext,
+        readonly pageNumber: number
     ) {
+        super();
     }
 
     get url() {
         return `${BASE_URL}/favorites/${this.context.targetUser}/${this.pageNumber}`;
     }
-    get headers() {
-        return this.context.headers;
-    }
 
-    parse(content: string) {
-        this.root = cheerio.load(content).root();
-        return this;
+    async root() {
+        return cheerio.load(await this.content()).root();
     }
-    
-    get isLastPage(): boolean {
-        return true;
+ 
+    async isLastPage(): Promise<boolean> {
+        return (await this.root()).find('.button-link.right.inactive').length == 0;
     }
 
     async *submissions() {
-        let figures = this.root.find('figure').toArray();
+        console.log(this.url);
+        let figures = (await this.root()).find('figure').toArray();
         for (const figure of figures) {
             const id = figure.attribs['id'].split('-')[1];
             yield new FuraffinitySubmission(this.context, id);
@@ -93,7 +96,7 @@ export class FuraffinitySite implements Site {
         do {
             page = new FuraffinityFavoritesPage(this.context, pageNumber++);
             yield page;
-        } while (!page.isLastPage);
+        } while (await page.isLastPage());
     }
 
     async *favorites() {

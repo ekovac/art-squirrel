@@ -25,11 +25,13 @@ export interface Site {
     favorites(): AsyncIterableIterator<Submission>;
 };
 
-export interface Fetchable {
+export abstract class Fetchable {
     url: string;
     headers: request.Headers;
-}
-
-export function fetch<T extends Fetchable>(obj: T): Promise<string> {
-    return requestPromise({url: obj.url, headers: obj.headers});
+    private contentPromise: Promise<string>;
+    content(): Promise<string> {
+        if (!this.contentPromise)
+            this.contentPromise = requestPromise({url: this.url, headers: this.headers});
+        return this.contentPromise;
+    }
 }
