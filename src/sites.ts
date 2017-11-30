@@ -3,18 +3,19 @@ import * as request from 'request';
 
 export interface SubmissionMetadata {
     imageUrl: string;
+    title: string;
     dateUploaded: Date;
     artist: {
         name: string,
         url?: string,
     };
-    tags: Set<string>;
+    tags: Map<string, string>;
 }
 
 export interface Submission {
     readonly id: string;
-    imageContent: Promise<Uint8Array>;
-    metadata: Promise<SubmissionMetadata>;
+    imageContent(): Promise<Uint8Array>;
+    metadata(): Promise<SubmissionMetadata>;
 }
 
 export interface CommonSiteConfig {

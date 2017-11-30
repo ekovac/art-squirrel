@@ -1,13 +1,25 @@
 (Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol.for("Symbol.asyncIterator");
-import {FuraffinitySite, FuraffinityConfig} from './sites/furaffinity'
+import {SubmissionMetadata} from './sites';
+import {FuraffinitySite, FuraffinityConfig} from './sites/furaffinity';
 let config: FuraffinityConfig = {
     collectionPath: 'Pictures/FuraffinityFavorites',
     username: 'digitalfox',
 }
 let fs = new FuraffinitySite(config);
+
+function sleep(ms:number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 async function listFavorites() {
-    for await (const fave of fs.favorites()) {
-        console.log(fave.id);
+    for await (const sub of fs.favorites()) {
+        let meta: SubmissionMetadata;
+        try {
+          meta = await sub.metadata();
+        } catch (error) {
+          console.error(error);
+        }
+        await sleep(1000);
+        console.log(sub.toString());
     }
 }
 listFavorites();
