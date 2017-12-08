@@ -1,8 +1,8 @@
 (Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol.for("Symbol.asyncIterator");
-import {SubmissionMetadata} from './sites';
+import {SubmissionMetadata} from './common';
 import {FuraffinitySite, FuraffinityConfig} from './sites/furaffinity';
 let config: FuraffinityConfig = {
-    collectionPath: 'Pictures/FuraffinityFavorites',
+    collectionTarget: 'Pictures/FuraffinityFavorites',
     username: 'digitalfox',
 }
 let fs = new FuraffinitySite(config);

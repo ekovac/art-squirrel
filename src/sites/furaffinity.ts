@@ -1,11 +1,10 @@
-import {Site, CommonSiteConfig, SubmissionMetadata, Submission, Fetchable} from '../sites';
+import {Site, SiteConfig, SubmissionMetadata, Submission, Fetchable} from '../common';
 import * as cheerio from 'cheerio';
 import * as request from 'request';
 import * as moment from 'moment';
 import * as requestPromise from 'request-promise-native';
 
-export type FuraffinityConfig = {
-    collectionPath: string;
+export interface FuraffinityConfig extends SiteConfig {
     targetUser?: string;
     username?: string;
     password?: string;
@@ -15,40 +14,31 @@ export type FuraffinityConfig = {
 const BASE_URL = "https://furaffinity.net";
 const USER_AGENT = "art-squirrel/0.1";
 /* Rate limit in requests/second */
-const RATE_LIMIT = 2.0; 
+const RATE_LIMIT = 2.0;
 /* Maximum variance in rate limit */
 const RATE_LIMIT_JITTER = 0.5;
 
-class FuraffinityContext {
-    constructor(readonly config: FuraffinityConfig) {
-    }
-
-    get headers(): request.Headers {
-        return {};
-    }
-
-    get targetUser(): string {
-        return this.config.targetUser || this.config.username;
-    }
-}
-
 abstract class FuraffinityFetchable extends Fetchable {
-    readonly context: FuraffinityContext;
+    readonly source: FuraffinitySite;
     url: string;
     get headers(): request.Headers {
-        return this.context.headers;
+        return this.source.headers;
     }
 }
 
 class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
-    constructor(readonly context: FuraffinityContext, readonly id: string) {
+    constructor(readonly source: FuraffinitySite, readonly id: string) {
         super();
+    }
+
+    get site(): string {
+        return this.source.name;
     }
 
     get url(): string {
         return `${BASE_URL}/view/${this.id}`;
     }
-    
+
     private cachedMetadata: SubmissionMetadata;
 
     private lineToPair(line:string) {
@@ -56,7 +46,7 @@ class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
         if (line_re.test(line)) {
             let [property, value, ..._] = line.split(": ", 2);
             property = "fa-" + property.toLowerCase();
-            return [property, value];   
+            return [property, value];
         }
         return undefined;
     }
@@ -68,7 +58,7 @@ class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
         pairs.forEach(pair => tags.set(pair[0], pair[1]));
 
         const keywordsStart = lines.lastIndexOf("Keywords:");
-        
+
         if (keywordsStart > -1 && keywordsStart + 1 < lines.length) {
             const keywords = lines.slice(keywordsStart+1);
             tags.set("keywords", JSON.stringify(keywords));
@@ -109,26 +99,26 @@ class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
     }
 
     toString(): string {
-        return JSON.stringify({id: this.id, metadata: this.cachedMetadata});
+        return JSON.stringify({id: this.id, site: this.site, metadata: this.cachedMetadata});
     }
 }
 
 class FuraffinityFavoritesPage extends FuraffinityFetchable {
     constructor(
-        readonly context: FuraffinityContext,
+        readonly source: FuraffinitySite,
         readonly pageNumber: number
     ) {
         super();
     }
 
     get url() {
-        return `${BASE_URL}/favorites/${this.context.targetUser}/${this.pageNumber}`;
+        return `${BASE_URL}/favorites/${this.source.targetUser}/${this.pageNumber}`;
     }
 
     async root() {
         return cheerio.load(await this.content()).root();
     }
- 
+
     async isLastPage(): Promise<boolean> {
         return (await this.root()).find('.button-link.right.inactive').length == 0;
     }
@@ -138,22 +128,22 @@ class FuraffinityFavoritesPage extends FuraffinityFetchable {
         let figures = (await this.root()).find('figure').toArray();
         for (const figure of figures) {
             const id = figure.attribs['id'].split('-')[1];
-            yield new FuraffinitySubmission(this.context, id);
+            yield new FuraffinitySubmission(this.source, id);
         }
     }
 }
 
 export class FuraffinitySite implements Site {
-    private context: FuraffinityContext;
+    readonly name = "FurAffinity";
+
     constructor(readonly config: FuraffinityConfig) {
-        this.context = new FuraffinityContext(config);
     }
 
     private async *favoritePages(): AsyncIterableIterator<FuraffinityFavoritesPage> {
         let pageNumber = 1;
         let page: FuraffinityFavoritesPage = null;
         do {
-            page = new FuraffinityFavoritesPage(this.context, pageNumber++);
+            page = new FuraffinityFavoritesPage(this, pageNumber++);
             yield page;
         } while (await page.isLastPage());
     }
@@ -163,5 +153,12 @@ export class FuraffinitySite implements Site {
             yield* page.submissions();
         }
     }
-}
 
+    get headers(): request.Headers {
+        return {};
+    }
+
+    get targetUser(): string {
+        return this.config.targetUser || this.config.username;
+    }
+}

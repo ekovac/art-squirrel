@@ -14,15 +14,17 @@ export interface SubmissionMetadata {
 
 export interface Submission {
     readonly id: string;
+    readonly site: string;
     imageContent(): Promise<Uint8Array>;
     metadata(): Promise<SubmissionMetadata>;
 }
 
-export interface CommonSiteConfig {
-    collectionPath: string
+export interface SiteConfig {
+    collectionTarget: string|string[];
 };
 
 export interface Site {
+    readonly name: string;
     favorites(): AsyncIterableIterator<Submission>;
 };
 
@@ -36,3 +38,16 @@ export abstract class Fetchable {
         return this.contentPromise;
     }
 }
+
+/* Collection configuration types */
+
+export interface CollectionConfig {
+  collectionId: string; // For reference by SiteConfig.collectionTarget
+};
+
+export interface Collection {
+  get(submissionId: string): Submission;
+  store(submission: Submission): Promise<void>;
+  listIds(): Promise<string[]>;
+  list?(): Promise<Submission[]>;
+};
