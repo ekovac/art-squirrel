@@ -30,6 +30,7 @@
     "cookies.txt": "^0.1.2",
     "fs-extra": "^4.0.3",
     "moment": "^2.19.3",
+    "prettier": "^1.9.1",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
     "tough-cookie": "^2.3.3",

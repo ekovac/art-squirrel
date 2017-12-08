@@ -1,7 +1,15 @@
-import {register, COLLECTION, Collection, CollectionConfig, Submission, SubmissionIdentifier, SubmissionMetadata} from '../common';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as process from 'process';
+import {
+  register,
+  COLLECTION,
+  Collection,
+  CollectionConfig,
+  Submission,
+  SubmissionIdentifier,
+  SubmissionMetadata
+} from "../common";
+import * as fs from "fs-extra";
+import * as path from "path";
+import * as process from "process";
 
 export interface FilesystemConfig extends CollectionConfig {
   path?: string;
@@ -21,10 +29,10 @@ export class Filesystem implements Collection {
       console.error(e);
       return;
     }
-    const extIndex = metadata.imageUrl.lastIndexOf('.');
+    const extIndex = metadata.imageUrl.lastIndexOf(".");
     let ext = "jpg";
     if (extIndex != -1 && extIndex < metadata.imageUrl.length - 1) {
-      ext = metadata.imageUrl.slice(extIndex+1);
+      ext = metadata.imageUrl.slice(extIndex + 1);
     }
     const fileName = `${submission.site} ${submission.id}.${ext}`;
     const outputPath = path.join(this.config.path, fileName);
@@ -38,7 +46,7 @@ export class Filesystem implements Collection {
       },
       failure => {
         console.error(failure);
-      },
+      }
     );
   }
 
@@ -48,8 +56,8 @@ export class Filesystem implements Collection {
     for (const filePath of files) {
       const extension = path.extname(filePath);
       const baseName = path.basename(filePath, extension);
-      const [site, id] = baseName.split(' ',1);
-      identifiers.push({site, id});
+      const [site, id] = baseName.split(" ", 1);
+      identifiers.push({ site, id });
     }
     return identifiers;
   }

@@ -1,21 +1,21 @@
-import * as requestPromise from 'request-promise-native';
-import * as request from 'request';
+import * as requestPromise from "request-promise-native";
+import * as request from "request";
 
 export interface CollectionEntry {
-  id?: string,
-  type: string,
-  config: CollectionConfig,
+  id?: string;
+  type: string;
+  config: CollectionConfig;
 }
 
 export interface SiteEntry {
-  id?: string,
-  type: string,
-  config: SiteConfig,
+  id?: string;
+  type: string;
+  config: SiteConfig;
 }
 
 export interface Config {
-  collections: CollectionEntry[],
-  sites: SiteEntry[],
+  collections: CollectionEntry[];
+  sites: SiteEntry[];
 }
 
 /* Module registry */
@@ -66,18 +66,22 @@ class Map2D<K1, K2, V> {
 export const SITE = "site";
 export const COLLECTION = "collection";
 export const FILETYPE = "filetype";
-export type ModuleType = typeof SITE|typeof COLLECTION|typeof FILETYPE;
-type CONSTRUCTOR = {new(...args:any[]):{}};
+export type ModuleType = typeof SITE | typeof COLLECTION | typeof FILETYPE;
+type CONSTRUCTOR = { new (...args: any[]): {} };
 
 export const sharedRegistry = new Map2D<ModuleType, string, CONSTRUCTOR>();
 
 export function register(typ: ModuleType) {
   return (constructor: CONSTRUCTOR) => {
-      sharedRegistry.set(typ, constructor.name as string, constructor);
-  }
+    sharedRegistry.set(typ, constructor.name as string, constructor);
+  };
 }
 
-export function instantiate(typ: ModuleType, name: string, ...args:any[]): any {
+export function instantiate(
+  typ: ModuleType,
+  name: string,
+  ...args: any[]
+): any {
   const constructor = sharedRegistry.get(typ, name);
   return new constructor(...args);
 }
@@ -89,14 +93,14 @@ export function debugRegistry() {
 }
 
 export interface SubmissionMetadata {
-    imageUrl: string;
-    title: string;
-    dateUploaded: Date;
-    artist: {
-        name: string,
-        url?: string,
-    };
-    tags: Map<string, string>;
+  imageUrl: string;
+  title: string;
+  dateUploaded: Date;
+  artist: {
+    name: string;
+    url?: string;
+  };
+  tags: Map<string, string>;
 }
 
 export interface SubmissionIdentifier {
@@ -105,40 +109,44 @@ export interface SubmissionIdentifier {
 }
 
 export interface Submission extends SubmissionIdentifier {
-    image(): Promise<Fetchable>;
-    metadata(): Promise<SubmissionMetadata>;
+  image(): Promise<Fetchable>;
+  metadata(): Promise<SubmissionMetadata>;
 }
 
 export interface SiteConfig {
-    target: string|string[];
-    [key: string]: any,
-};
+  target: string | string[];
+  [key: string]: any;
+}
 
 export interface Site {
-    favorites(): AsyncIterableIterator<Submission>;
-};
+  favorites(): AsyncIterableIterator<Submission>;
+}
 
 export abstract class Fetchable {
-    url: string;
-    headers: request.Headers;
-    private contentPromise: Promise<Buffer>|null;
-    content(): Promise<Buffer> {
-        if (!this.contentPromise)
-            this.contentPromise = requestPromise({url: this.url, headers: this.headers, encoding: null});
-        return this.contentPromise;
-    }
+  url: string;
+  headers: request.Headers;
+  private contentPromise: Promise<Buffer> | null;
+  content(): Promise<Buffer> {
+    if (!this.contentPromise)
+      this.contentPromise = requestPromise({
+        url: this.url,
+        headers: this.headers,
+        encoding: null
+      });
+    return this.contentPromise;
+  }
 }
 
 /* Collection configuration types */
 
 export interface CollectionConfig {
   id?: string; // For reference by SiteConfig.collectionTarget
-  [key: string]: any,
-};
+  [key: string]: any;
+}
 
 export interface Collection {
   get?(submissionId: SubmissionIdentifier): Submission;
   store(submission: Submission): Promise<void>;
   listIds(): Promise<SubmissionIdentifier[]>;
   list?(): Promise<Submission[]>;
-};
+}
