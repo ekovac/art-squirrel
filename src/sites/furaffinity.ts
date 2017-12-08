@@ -1,8 +1,9 @@
-import {Site, SiteConfig, SubmissionMetadata, Submission, Fetchable} from '../common';
+import {register, SITE, Site, SiteConfig, SubmissionMetadata, Submission, Fetchable} from '../common';
 import * as cheerio from 'cheerio';
 import * as request from 'request';
 import * as moment from 'moment';
 import * as requestPromise from 'request-promise-native';
+import * as nodeUrl from 'url';
 
 export interface FuraffinityConfig extends SiteConfig {
     targetUser?: string;
@@ -26,6 +27,11 @@ abstract class FuraffinityFetchable extends Fetchable {
     }
 }
 
+class BaseFetchable extends Fetchable {
+  constructor(readonly url: string, readonly headers: request.Headers) {
+    super();
+  }
+}
 class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
     constructor(readonly source: FuraffinitySite, readonly id: string) {
         super();
@@ -63,7 +69,6 @@ class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
             const keywords = lines.slice(keywordsStart+1);
             tags.set("keywords", JSON.stringify(keywords));
         }
-        console.log(tags);
 
         return tags;
     }
@@ -81,7 +86,8 @@ class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
             name: artistLink.text(),
             url: BASE_URL + artistLink.attr('href'),
         };
-        const imageUrl = root.find('div.alt1.actions.aligncenter a:contains(Download)').attr('href');
+        const imageHref = root.find('div.alt1.actions.aligncenter a:contains(Download)').attr('href');
+        const imageUrl = nodeUrl.resolve(this.url, imageHref);
         const dateUploadedText = root.find('td.stats-container span.popup_date').attr('title');
         const dateUploaded = moment(dateUploadedText, "MMM Do, YYYY h:mm A").toDate();
         /* FA-specific fields */
@@ -91,11 +97,12 @@ class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
         return this.cachedMetadata
     }
     async root() {
-        return cheerio.load(await this.content()).root();
+        const content = await this.content();
+        return cheerio.load(content.toString()).root();
     }
 
-    imageContent(): Promise<Uint8Array> {
-        return Promise.resolve(new Uint8Array(0));
+    async image(): Promise<Fetchable> {
+      return new BaseFetchable((await this.metadata()).imageUrl, this.source.headers);
     }
 
     toString(): string {
@@ -116,7 +123,8 @@ class FuraffinityFavoritesPage extends FuraffinityFetchable {
     }
 
     async root() {
-        return cheerio.load(await this.content()).root();
+        const content = await this.content();
+        return cheerio.load(content.toString()).root();
     }
 
     async isLastPage(): Promise<boolean> {
@@ -124,7 +132,6 @@ class FuraffinityFavoritesPage extends FuraffinityFetchable {
     }
 
     async *submissions() {
-        console.log(this.url);
         let figures = (await this.root()).find('figure').toArray();
         for (const figure of figures) {
             const id = figure.attribs['id'].split('-')[1];
@@ -133,6 +140,7 @@ class FuraffinityFavoritesPage extends FuraffinityFetchable {
     }
 }
 
+@register(SITE)
 export class FuraffinitySite implements Site {
     readonly name = "FurAffinity";
 
@@ -155,7 +163,7 @@ export class FuraffinitySite implements Site {
     }
 
     get headers(): request.Headers {
-        return {};
+        return {'User-Agent': USER_AGENT};
     }
 
     get targetUser(): string {

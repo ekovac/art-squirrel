@@ -20,6 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/cheerio": "^0.22.5",
+    "@types/fs-extra": "^4.0.5",
     "@types/moment": "^2.13.0",
     "@types/request": "^2.0.8",
     "@types/request-promise-native": "^1.0.10",
@@ -27,6 +28,7 @@
     "@types/yargs": "^8.0.2",
     "cheerio": "^1.0.0-rc.2",
     "cookies.txt": "^0.1.2",
+    "fs-extra": "^4.0.3",
     "moment": "^2.19.3",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
