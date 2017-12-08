@@ -5,6 +5,7 @@
         "noImplicitAny": true,
         "lib": ["ES2017", "DOM", "esnext.asynciterable"],
         "rootDir": "./src/",
+        "outDir": "./out/",
         "module": "CommonJS"
     }
 }
