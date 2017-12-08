@@ -2,8 +2,12 @@
   "name": "art-squirrel",
   "version": "0.0.1",
   "description": "A tool for backup, tagging, and deduplication of art site posts.",
-  "main": "index.js",
+  "main": "out/index.js",
+  "bin": {
+    "art-squirrel": "./out/index.js"
+  },
   "scripts": {
+    "prepublish": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,7 +22,7 @@
   ],
   "author": "Philip \"digitalfox\" Kovac <digitalfox@binaryden.net>",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "@types/cheerio": "^0.22.5",
     "@types/fs-extra": "^4.0.5",
     "@types/moment": "^2.13.0",
@@ -26,11 +30,13 @@
     "@types/request-promise-native": "^1.0.10",
     "@types/tough-cookie": "^2.3.2",
     "@types/yargs": "^8.0.2",
+    "prettier": "^1.9.1",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {
     "cheerio": "^1.0.0-rc.2",
-    "cookies.txt": "^0.1.2",
     "fs-extra": "^4.0.3",
     "moment": "^2.19.3",
-    "prettier": "^1.9.1",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
     "tough-cookie": "^2.3.3",
