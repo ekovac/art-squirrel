@@ -1,23 +1,23 @@
 (Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol.for("Symbol.asyncIterator");
-import {SubmissionMetadata, Config} from './common';
-import {FuraffinitySite, FuraffinityConfig} from './sites/furaffinity';
+import {SubmissionMetadata, Config, debugRegistry} from './common';
+import {Furaffinity, FuraffinityConfig} from './sites/furaffinity';
 import {Filesystem} from './collections/filesystem';
 
 let config: Config = {
     sites: [{
-      type: 'furaffinity',
+      type: 'Furaffinity',
       config: {
-        target: 'filesystem',
+        target: 'Filesystem',
         username: 'digitalfox',
       },
     }],
     collections: [{
-      type: 'filesystem',
+      type: 'Filesystem',
       config: {},
     }]
 };
 
-let site = new FuraffinitySite(config.sites[0].config);
+let site = new Furaffinity(config.sites[0].config);
 let collection = new Filesystem(config.collections[0].config);
 
 function sleep(ms:number) {
@@ -30,3 +30,4 @@ async function listFavorites() {
     }
 }
 listFavorites();
+//debugRegistry();

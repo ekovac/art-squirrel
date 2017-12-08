@@ -1,4 +1,4 @@
-import {Collection, CollectionConfig, Submission, SubmissionIdentifier, SubmissionMetadata} from '../common';
+import {register, COLLECTION, Collection, CollectionConfig, Submission, SubmissionIdentifier, SubmissionMetadata} from '../common';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as process from 'process';
@@ -7,8 +7,8 @@ export interface FilesystemConfig extends CollectionConfig {
   path?: string;
 }
 
+@register(COLLECTION)
 export class Filesystem implements Collection {
-  readonly name = "Filesystem";
   constructor(private readonly config: FilesystemConfig) {
     config.path = config.path || path.join(process.env.HOME, "Pictures");
   }

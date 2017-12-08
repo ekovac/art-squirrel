@@ -46,6 +46,18 @@ class Map2D<K1, K2, V> {
     return undefined;
   }
 
+  topKeys(): IterableIterator<K1> {
+    return this.map.keys();
+  }
+
+  *allKeys(): IterableIterator<[K1, K2]> {
+    for (const k1 of this.map.keys()) {
+      for (const k2 of this.map.get(k1).keys()) {
+        yield [k1, k2];
+      }
+    }
+  }
+
   clear() {
     this.map.clear();
   }
@@ -61,13 +73,19 @@ export const sharedRegistry = new Map2D<ModuleType, string, CONSTRUCTOR>();
 
 export function register(typ: ModuleType) {
   return (constructor: CONSTRUCTOR) => {
-      sharedRegistry.set(typ, constructor.prototype.name as string, constructor);
+      sharedRegistry.set(typ, constructor.name as string, constructor);
   }
 }
 
 export function instantiate(typ: ModuleType, name: string, ...args:any[]): any {
   const constructor = sharedRegistry.get(typ, name);
   return new constructor(...args);
+}
+
+export function debugRegistry() {
+  for (const entry of sharedRegistry.allKeys()) {
+    console.log(entry);
+  }
 }
 
 export interface SubmissionMetadata {
@@ -97,7 +115,6 @@ export interface SiteConfig {
 };
 
 export interface Site {
-    readonly name: string;
     favorites(): AsyncIterableIterator<Submission>;
 };
 

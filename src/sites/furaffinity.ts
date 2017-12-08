@@ -20,7 +20,7 @@ const RATE_LIMIT = 2.0;
 const RATE_LIMIT_JITTER = 0.5;
 
 abstract class FuraffinityFetchable extends Fetchable {
-    readonly source: FuraffinitySite;
+    readonly source: Furaffinity;
     url: string;
     get headers(): request.Headers {
         return this.source.headers;
@@ -33,12 +33,12 @@ class BaseFetchable extends Fetchable {
   }
 }
 class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
-    constructor(readonly source: FuraffinitySite, readonly id: string) {
+    constructor(readonly source: Furaffinity, readonly id: string) {
         super();
     }
 
     get site(): string {
-        return this.source.name;
+        return Object.getPrototypeOf(this.source).constructor.name;
     }
 
     get url(): string {
@@ -112,7 +112,7 @@ class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
 
 class FuraffinityFavoritesPage extends FuraffinityFetchable {
     constructor(
-        readonly source: FuraffinitySite,
+        readonly source: Furaffinity,
         readonly pageNumber: number
     ) {
         super();
@@ -141,9 +141,7 @@ class FuraffinityFavoritesPage extends FuraffinityFetchable {
 }
 
 @register(SITE)
-export class FuraffinitySite implements Site {
-    readonly name = "FurAffinity";
-
+export class Furaffinity implements Site {
     constructor(readonly config: FuraffinityConfig) {
     }
 
