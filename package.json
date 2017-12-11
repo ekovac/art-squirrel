@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/cheerio": "^0.22.5",
     "@types/fs-extra": "^4.0.5",
+    "@types/jsonschema": "^1.1.1",
     "@types/moment": "^2.13.0",
     "@types/request": "^2.0.8",
     "@types/request-promise-native": "^1.0.10",
@@ -34,8 +35,11 @@
     "typescript": "^2.6.2"
   },
   "dependencies": {
+    "@types/file-type": "^5.2.1",
     "cheerio": "^1.0.0-rc.2",
+    "file-type": "^7.4.0",
     "fs-extra": "^4.0.3",
+    "jsonschema": "^1.2.0",
     "moment": "^2.19.3",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",

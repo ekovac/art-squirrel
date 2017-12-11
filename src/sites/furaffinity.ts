@@ -1,24 +1,33 @@
 import {
-  register,
-  SITE,
   Site,
   SiteConfig,
   SubmissionMetadata,
   Submission,
   Fetchable
 } from "../common";
+import { SITE } from "../plugin_registry";
 import * as cheerio from "cheerio";
 import * as request from "request";
 import * as moment from "moment";
 import * as requestPromise from "request-promise-native";
 import * as nodeUrl from "url";
+import { Schema } from "jsonschema";
 
 export interface FuraffinityConfig extends SiteConfig {
-  targetUser?: string;
-  username?: string;
-  password?: string;
-  cookie_location?: string;
+  // A valid set of login cookies needed for accessing adult artwork or artwork
+  // restricted to members only. If not specified, defaults to 'cookies.txt'
+  cookieLocation?: string;
 }
+// And a config schema for it.
+const CONFIG_SCHEMA: Schema = {
+  id: "FuraffinityConfig",
+  type: "object",
+  properties: {
+    target: { type: "array", items: { type: "string" } },
+    query: { type: "array", items: { type: "string" } },
+    cookieLocation: { type: "string" }
+  }
+};
 
 const BASE_URL = "https://furaffinity.net";
 const USER_AGENT = "art-squirrel/0.1";
@@ -137,13 +146,17 @@ class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
   }
 }
 
-class FuraffinityFavoritesPage extends FuraffinityFetchable {
-  constructor(readonly source: Furaffinity, readonly pageNumber: number) {
+class FavoritesPage extends FuraffinityFetchable {
+  constructor(
+    readonly source: Furaffinity,
+    readonly username: string,
+    readonly pageNumber: number
+  ) {
     super();
   }
 
   get url() {
-    return `${BASE_URL}/favorites/${this.source.targetUser}/${this.pageNumber}`;
+    return `${BASE_URL}/favorites/${this.username}/${this.pageNumber}`;
   }
 
   async root() {
@@ -164,32 +177,40 @@ class FuraffinityFavoritesPage extends FuraffinityFetchable {
   }
 }
 
-@register(SITE)
+@SITE(CONFIG_SCHEMA)
 export class Furaffinity implements Site {
-  constructor(readonly config: FuraffinityConfig) {}
-
-  private async *favoritePages(): AsyncIterableIterator<
-    FuraffinityFavoritesPage
-  > {
+  constructor(readonly config: FuraffinityConfig, readonly path: string) {}
+  private async *favoritePages(
+    username: string
+  ): AsyncIterableIterator<FavoritesPage> {
     let pageNumber = 1;
-    let page: FuraffinityFavoritesPage = null;
+    let page: FavoritesPage = null;
     do {
-      page = new FuraffinityFavoritesPage(this, pageNumber++);
+      page = new FavoritesPage(this, username, pageNumber++);
       yield page;
     } while (await page.isLastPage());
   }
 
-  async *favorites() {
-    for await (const page of this.favoritePages()) {
+  async *submissions() {
+    for (const query of this.config.query) {
+      if (query.lastIndexOf(":") != -1) {
+        let [specialQueryType, parameter] = query.split(":", 1);
+        specialQueryType = specialQueryType.toLowerCase();
+        switch (specialQueryType) {
+          case "favorites":
+            yield* this.favorites(parameter);
+        }
+      }
+    }
+  }
+
+  private async *favorites(username: string) {
+    for await (const page of this.favoritePages(username)) {
       yield* page.submissions();
     }
   }
 
   get headers(): request.Headers {
     return { "User-Agent": USER_AGENT };
-  }
-
-  get targetUser(): string {
-    return this.config.targetUser || this.config.username;
   }
 }

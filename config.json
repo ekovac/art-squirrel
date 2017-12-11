@@ -1,0 +1,17 @@
+{
+  "sites": [
+    {
+      "type": "Furaffinity",
+      "config": {
+        "target": ["Filesystem"],
+        "query": ["favorites:digitalfox"]
+      }
+    }
+  ],
+  "collections": [
+    {
+      "type": "Filesystem",
+      "config": {}
+    }
+  ]
+}
