@@ -36,6 +36,19 @@ export interface Submission extends SubmissionIdentifier {
   metadata(): Promise<SubmissionMetadata>;
 }
 
+export function makeStaticSubmission(
+  identifier: SubmissionIdentifier,
+  metadata: SubmissionMetadata,
+  buffer?: Buffer
+): Submission {
+  const fetchable = new StaticFetchable(buffer);
+  return {
+    ...identifier,
+    image: () => Promise.resolve(fetchable),
+    metadata: () => Promise.resolve(metadata)
+  };
+}
+
 export interface SiteConfig {
   target: string[];
   query: string[];
@@ -61,6 +74,26 @@ export abstract class Fetchable {
     return this.contentPromise;
   }
 }
+export class BasicFetchable extends Fetchable {
+  constructor(readonly url: string, readonly headers: request.Headers) {
+    super();
+  }
+}
+
+export class StaticFetchable extends Fetchable {
+  url = "";
+  headers = {};
+  constructor(private readonly staticContent: Buffer | null) {
+    super();
+  }
+  content(): Promise<Buffer> {
+    if (this.staticContent === null) {
+      Promise.reject("No content supplied for this StaticFetchable.");
+    } else {
+      return Promise.resolve(this.staticContent);
+    }
+  }
+}
 
 /* Collection configuration types */
 
@@ -74,4 +107,23 @@ export interface Collection {
   store(submission: Submission): Promise<void>;
   listIds(): Promise<SubmissionIdentifier[]>;
   list?(): Promise<Submission[]>;
+}
+
+export interface FiletypeHandler {
+  mimeTypes: string[];
+  serializer: (submission: Submission) => Promise<Buffer>;
+  deserializer: (content: Promise<Buffer>) => Promise<Submission>;
+}
+
+type StringObj = { [key: string]: string };
+export function mapToObject(map: Map<string, string>): StringObj {
+  const newObject: StringObj = {};
+  for (const [key, value] of map.entries()) {
+    newObject[key] = value;
+  }
+  return newObject;
+}
+
+export function objectToMap(object: StringObj): Map<string, string> {
+  return new Map<string, string>(Object.entries(object));
 }

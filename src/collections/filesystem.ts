@@ -12,6 +12,8 @@ import * as process from "process";
 import * as fileType from "file-type";
 import { Schema } from "jsonschema";
 
+import { handler } from "../filetypes/jpeg";
+
 export interface FilesystemConfig extends CollectionConfig {
   path?: string;
 }
@@ -49,7 +51,7 @@ export class Filesystem implements Collection {
     /* TODO: Examine filetype modules, embed info based on filetype */
     const image = await submission.image();
     return image.content().then(
-      content => {
+      async content => {
         const type = fileType(content);
         if (type) {
           ext = type.ext;
@@ -62,7 +64,9 @@ export class Filesystem implements Collection {
           );
         }
         const outputPath = `${outputPathNoExtension}.${ext}`;
-        console.log(metadata.imageUrl, content.length);
+        if (type.mime == "image/jpeg") {
+          content = await handler.serializer(submission);
+        }
         return fs.writeFile(outputPath, content);
       },
       failure => {
@@ -77,7 +81,7 @@ export class Filesystem implements Collection {
     for (const filePath of files) {
       const extension = path.extname(filePath);
       const baseName = path.basename(filePath, extension);
-      const [site, id] = baseName.split(" ", 1);
+      const [site, id] = baseName.split(" ", 2);
       identifiers.push({ site, id });
     }
     return identifiers;

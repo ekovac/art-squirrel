@@ -1,6 +1,6 @@
 import { Config, PluginConfig, loadConfig } from "./config";
 import { makeSite, makeCollection } from "./plugin_registry";
-import { SubmissionMetadata, APPNAME, Site, Collection } from "./common";
+import { APPNAME, Site, Collection, SubmissionIdentifier } from "./common";
 import { Filesystem } from "./collections/filesystem";
 
 function makePlugins<T, S>(
@@ -32,9 +32,58 @@ export class ArtSquirrel {
       configPath,
       makeCollection
     );
-    console.log(this.siteNames);
-    console.log(this.collectionNames);
     this.resolveTargets();
+  }
+
+  async identifyExistingSubmissions(
+    site: string,
+    outputs: Collection[]
+  ): Promise<Map<Collection, Set<string>>> {
+    const outputExistingSubmissions = new Map<Collection, Set<string>>();
+    for (const collection of outputs) {
+      const existingSubmissions = await collection.listIds();
+
+      for (const submissionId of existingSubmissions) {
+        if (submissionId.site != site) continue;
+        const set =
+          outputExistingSubmissions.get(collection) || new Set<string>();
+        set.add(submissionId.id);
+        outputExistingSubmissions.set(collection, set);
+      }
+    }
+    return outputExistingSubmissions;
+  }
+
+  async process() {
+    for (const [site, collections] of this.inputsToOutputs.entries()) {
+      const existingSubmissionsByCollection = await this.identifyExistingSubmissions(
+        Object.getPrototypeOf(site).constructor.name,
+        collections
+      );
+      console.log(existingSubmissionsByCollection);
+      for await (const submission of site.submissions()) {
+        for (const collection of collections) {
+          const existingSubmissions =
+            existingSubmissionsByCollection.get(collection) || new Set();
+          // TODO: Add commandline param to force fetching, or to abort fetching on the first already-fetched submission.
+          if (!existingSubmissions.has(submission.id)) {
+            const poorMansThrottle = new Promise((resolve, reject) => {
+              setTimeout(() => {
+                resolve();
+              }, 500);
+            });
+            await poorMansThrottle;
+            await collection.store(submission);
+          } else {
+            console.log(
+              "Skipped submission {%s,%s}",
+              submission.site,
+              submission.id
+            );
+          }
+        }
+      }
+    }
   }
 
   resolveTargets() {

@@ -3,7 +3,8 @@ import {
   SiteConfig,
   SubmissionMetadata,
   Submission,
-  Fetchable
+  Fetchable,
+  BasicFetchable
 } from "../common";
 import { SITE } from "../plugin_registry";
 import * as cheerio from "cheerio";
@@ -31,9 +32,9 @@ const CONFIG_SCHEMA: Schema = {
 
 const BASE_URL = "https://furaffinity.net";
 const USER_AGENT = "art-squirrel/0.1";
-/* Rate limit in requests/second */
+// Rate limit in requests/second
 const RATE_LIMIT = 2.0;
-/* Maximum variance in rate limit */
+// Maximum variance in rate limit
 const RATE_LIMIT_JITTER = 0.5;
 
 abstract class FuraffinityFetchable extends Fetchable {
@@ -44,11 +45,6 @@ abstract class FuraffinityFetchable extends Fetchable {
   }
 }
 
-class BaseFetchable extends Fetchable {
-  constructor(readonly url: string, readonly headers: request.Headers) {
-    super();
-  }
-}
 class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
   constructor(readonly source: Furaffinity, readonly id: string) {
     super();
@@ -131,7 +127,7 @@ class FuraffinitySubmission extends FuraffinityFetchable implements Submission {
   }
 
   async image(): Promise<Fetchable> {
-    return new BaseFetchable(
+    return new BasicFetchable(
       (await this.metadata()).imageUrl,
       this.source.headers
     );
@@ -165,7 +161,7 @@ class FavoritesPage extends FuraffinityFetchable {
   }
 
   async isLastPage(): Promise<boolean> {
-    return (await this.root()).find(".button-link.right.inactive").length == 0;
+    return (await this.root()).find(".button-link.right.inactive").length != 0;
   }
 
   async *submissions() {
@@ -188,13 +184,13 @@ export class Furaffinity implements Site {
     do {
       page = new FavoritesPage(this, username, pageNumber++);
       yield page;
-    } while (await page.isLastPage());
+    } while (!await page.isLastPage());
   }
 
-  async *submissions() {
+  async *submissions(): AsyncIterableIterator<Submission> {
     for (const query of this.config.query) {
       if (query.lastIndexOf(":") != -1) {
-        let [specialQueryType, parameter] = query.split(":", 1);
+        let [specialQueryType, parameter] = query.split(":", 2);
         specialQueryType = specialQueryType.toLowerCase();
         switch (specialQueryType) {
           case "favorites":
@@ -204,7 +200,9 @@ export class Furaffinity implements Site {
     }
   }
 
-  private async *favorites(username: string) {
+  private async *favorites(
+    username: string
+  ): AsyncIterableIterator<Submission> {
     for await (const page of this.favoritePages(username)) {
       yield* page.submissions();
     }
