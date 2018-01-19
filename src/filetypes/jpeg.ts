@@ -8,7 +8,7 @@ import {
 } from "../common";
 import * as piexif from "piexifjs";
 
-export const handler: FiletypeHandler = {
+export const jpeg: FiletypeHandler = {
   mimeTypes: ["image/jpeg"],
   async serializer(submission: Submission): Promise<Buffer> {
     const content = await (await submission.image()).content();

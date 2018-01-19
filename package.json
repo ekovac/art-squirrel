@@ -42,6 +42,7 @@
     "jsonschema": "^1.2.0",
     "moment": "^2.19.3",
     "piexifjs": "^1.0.3",
+    "png-metadata": "^1.0.1",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
     "tough-cookie": "^2.3.3",

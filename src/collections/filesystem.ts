@@ -9,10 +9,8 @@ import { COLLECTION } from "../plugin_registry";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as process from "process";
-import * as fileType from "file-type";
+import { processForOutput } from "../filetypes/filetypes";
 import { Schema } from "jsonschema";
-
-import { handler } from "../filetypes/jpeg";
 
 export interface FilesystemConfig extends CollectionConfig {
   path?: string;
@@ -41,38 +39,18 @@ export class Filesystem implements Collection {
       return;
     }
     const extIndex = metadata.imageUrl.lastIndexOf(".");
-    let ext = "jpg";
+    let naiveExtension = "jpg";
     if (extIndex != -1 && extIndex < metadata.imageUrl.length - 1) {
-      ext = metadata.imageUrl.slice(extIndex + 1);
+      naiveExtension = metadata.imageUrl.slice(extIndex + 1);
     }
     const fileBaseName = `${submission.site} ${submission.id}`;
     const outputPathNoExtension = path.join(this.config.path, fileBaseName);
 
     /* TODO: Examine filetype modules, embed info based on filetype */
-    const image = await submission.image();
-    return image.content().then(
-      async content => {
-        const type = fileType(content);
-        if (type) {
-          ext = type.ext;
-        } else {
-          console.error(
-            "Unable to determine filetype for submission '%s';" +
-              " preserving extension '%s'.",
-            fileBaseName,
-            ext
-          );
-        }
-        const outputPath = `${outputPathNoExtension}.${ext}`;
-        if (type.mime == "image/jpeg") {
-          content = await handler.serializer(submission);
-        }
-        return fs.writeFile(outputPath, content);
-      },
-      failure => {
-        console.error(failure);
-      }
-    );
+
+    const { content, ext } = await processForOutput(submission);
+    const finalOutputPath = [outputPathNoExtension, ext].join(".");
+    return fs.writeFile(finalOutputPath, content);
   }
 
   async listIds(): Promise<SubmissionIdentifier[]> {
