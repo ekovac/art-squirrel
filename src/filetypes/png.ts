@@ -21,8 +21,8 @@ export const png: FiletypeHandler = {
       id: submission.id,
       site: submission.site
     };
-
     tags.set("ImageUniqueID", JSON.stringify(identifier));
+
     tags.set("Title", metadata.title);
     tags.set("Author", metadata.artist.name);
     tags.set("Author URL", metadata.artist.url);

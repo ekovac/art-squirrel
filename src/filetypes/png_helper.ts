@@ -48,6 +48,8 @@ export class PngImage {
       const newChunk = new TextualData(keyword, text);
       newChunks.push(newChunk);
     }
+    /* We need to place the new chunks before the IDAT or pngmeta, pnginfo, etc
+     * won't read it. */
     chunks = [].concat(chunks.slice(0, 1), newChunks, chunks.slice(1));
     this._buffer = Buffer.from(
       png_metadata.joinChunk(chunks) as string,
