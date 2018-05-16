@@ -4,11 +4,12 @@
   "description": "A tool for backup, tagging, and deduplication of art site posts.",
   "main": "out/index.js",
   "bin": {
-    "art-squirrel": "./out/index.js"
+    "art-squirrel": "./dist/src/index.js"
   },
   "scripts": {
     "prepublish": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf dist/"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
     "jasmine": "^3.1.0",
     "jasmine-ts-console-reporter": "^3.1.1",
     "prettier": "^1.9.1",
+    "rimraf": "^2.6.2",
     "typescript": "^2.6.2"
   },
   "dependencies": {

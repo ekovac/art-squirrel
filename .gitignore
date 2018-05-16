@@ -1,5 +1,5 @@
 src/**/*.js
 *.swp
 node_modules/
-out/
+dist/
 cookies.txt

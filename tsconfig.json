@@ -4,9 +4,9 @@
     "target": "ES2017",
     "noImplicitAny": true,
     "lib": ["ES2017", "DOM", "esnext.asynciterable"],
-    "rootDir": "./src/",
-    "outDir": "./out/",
-    "module": "CommonJS"
+    "outDir": "./dist/",
+    "module": "CommonJS",
+    "moduleResolution": "node"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "spec/**/*"]
 }
