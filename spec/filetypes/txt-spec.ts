@@ -1,4 +1,4 @@
-import { txt } from "../src/filetypes/txt";
+import { txt } from "../../src/filetypes/txt";
 import * as fs from "fs-extra";
 import * as crypto from "crypto";
 
