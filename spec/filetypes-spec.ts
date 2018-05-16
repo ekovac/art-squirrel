@@ -1,5 +1,6 @@
 import { txt } from "../src/filetypes/txt";
 import * as fs from "fs-extra";
+import * as crypto from "crypto";
 
 const TEST_FILE_NAME = "test_data/test.txt";
 
@@ -42,5 +43,21 @@ describe("Text submission deserializer", () => {
     expect(metadata.tags.get("keywords")).toBe(
       JSON.stringify(["sample", "fake", "latin"])
     );
+  });
+});
+
+describe("Text submission serializer", () => {
+  it("should roundtrip the document verbatim", async () => {
+    const input = fs.readFile(TEST_FILE_NAME);
+    const inputHash = crypto.createHash("sha256");
+    inputHash.update(await input);
+
+    const submission = await txt.deserializer(input);
+
+    const output = txt.serializer(submission);
+    const outputHash = crypto.createHash("sha256");
+    outputHash.update(await output);
+
+    expect(outputHash.digest("base64")).toBe(inputHash.digest("base64"));
   });
 });
