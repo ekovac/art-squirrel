@@ -23,6 +23,7 @@ interface YamlSuffix {
   Site: string;
   ID: string;
   Tags: { [key: string]: string };
+  Keywords?: string[];
 }
 
 export const txt: FiletypeHandler = {
@@ -43,11 +44,20 @@ export const txt: FiletypeHandler = {
       },
       Date: metadata.dateUploaded.toString()
     };
+
+    const tags = mapToObject(metadata.tags);
+    let keywords: string[] = undefined;
+    if (tags["keywords"]) {
+      keywords = JSON.parse(tags["keywords"]);
+      delete tags["keywords"];
+    }
+
     const suffix: YamlSuffix = {
       Source: metadata.imageUrl,
       Site: submission.site,
       ID: submission.id,
-      Tags: mapToObject(metadata.tags)
+      Tags: tags,
+      Keywords: keywords
     };
 
     const prefixText = yaml.safeDump(prefix);
@@ -73,13 +83,19 @@ export const txt: FiletypeHandler = {
 
     const prefix = yaml.safeLoad(prefixText) as YamlPrefix;
     const suffix = yaml.safeLoad(suffixText) as YamlSuffix;
+    const tags = suffix.Tags;
+    const keywords = suffix.Keywords;
+
+    if (keywords) {
+      tags["keywords"] = JSON.stringify(keywords);
+    }
 
     const metadata: SubmissionMetadata = {
       title: prefix.Title,
       artist: { name: prefix.Author.Name, url: prefix.Author.URL },
       dateUploaded: new Date(prefix.Date),
       imageUrl: suffix.Source,
-      tags: objectToMap(suffix.Tags)
+      tags: objectToMap(tags)
     };
 
     const identifier: SubmissionIdentifier = {
