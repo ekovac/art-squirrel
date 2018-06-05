@@ -3,6 +3,9 @@ import * as request from "request";
 
 export const APPNAME = "art-squirrel";
 
+export const APP_NAMESPACE_SEGMENTS = ["art-squirrel", "binaryden", "net"];
+export const APP_JAVA_NAMESPACE = APP_NAMESPACE_SEGMENTS.reverse().join(".");
+
 export interface CollectionEntry {
   id?: string;
   type: string;
@@ -29,6 +32,7 @@ export interface SubmissionMetadata {
 export interface SubmissionIdentifier {
   readonly id: string;
   readonly site: string;
+  readonly resource?: string;
 }
 
 export interface Submission extends SubmissionIdentifier {
@@ -102,11 +106,21 @@ export interface CollectionConfig {
   [key: string]: any;
 }
 
-export interface Collection {
-  get?(submissionId: SubmissionIdentifier): Submission;
-  store(submission: Submission): Promise<void>;
-  listIds(): Promise<SubmissionIdentifier[]>;
-  list?(): Promise<Submission[]>;
+export abstract class Collection {
+  async get(identifier: SubmissionIdentifier): Promise<Submission> {
+    const entries = await this.list();
+    for (const entry of entries) {
+      if (entry.id == identifier.id && entry.site == identifier.site) {
+        return this.fetch(entry.resource);
+      }
+    }
+    return Promise.reject(
+      `No such submission ${identifier.site}:${identifier.id}`
+    );
+  }
+  abstract store(submission: Submission): Promise<void>;
+  abstract fetch(resource: string): Promise<Submission>;
+  abstract list(): Promise<SubmissionIdentifier[]>;
 }
 
 export interface FiletypeHandler {

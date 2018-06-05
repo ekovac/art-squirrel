@@ -41,7 +41,7 @@ export class ArtSquirrel {
   ): Promise<Map<Collection, Set<string>>> {
     const outputExistingSubmissions = new Map<Collection, Set<string>>();
     for (const collection of outputs) {
-      const existingSubmissions = await collection.listIds();
+      const existingSubmissions = await collection.list();
 
       for (const submissionId of existingSubmissions) {
         if (submissionId.site != site) continue;

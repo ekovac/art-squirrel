@@ -46,6 +46,7 @@
     "detect-character-encoding": "^0.5.1",
     "file-type": "^7.4.0",
     "fs-extra": "^4.0.3",
+    "fs-xattr": "^0.2.1",
     "js-yaml": "^3.11.0",
     "jsonschema": "^1.2.0",
     "moment": "^2.19.3",
@@ -54,6 +55,7 @@
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
     "tough-cookie": "^2.3.3",
+    "util.promisify": "^1.0.0",
     "yargs": "^10.0.3"
   }
 }
