@@ -1,30 +1,27 @@
 {
   "name": "art-squirrel",
   "version": "0.0.1",
-  "description": "A tool for backup, tagging, and deduplication of art site posts.",
-  "main": "out/index.js",
+  "description":
+    "A tool for backup, tagging, and deduplication of art site posts.",
+  "main": "dist/src/index.js",
   "bin": {
     "art-squirrel": "./dist/src/index.js"
   },
   "scripts": {
     "prepublish": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tsc; jasmine",
     "clean": "rimraf dist/"
   },
   "repository": {
     "type": "git",
     "url": "/home/pkovac/src/../git/art-squirrel.git/"
   },
-  "keywords": [
-    "furaffinity",
-    "e621",
-    "weasyl",
-    "backup"
-  ],
+  "keywords": ["furaffinity", "e621", "weasyl", "backup"],
   "author": "Philip \"digitalfox\" Kovac <digitalfox@binaryden.net>",
   "license": "MIT",
   "devDependencies": {
     "@types/cheerio": "^0.22.5",
+    "@types/file-type": "^5.2.1",
     "@types/fs-extra": "^4.0.5",
     "@types/jasmine": "^2.8.7",
     "@types/js-yaml": "^3.11.1",
@@ -41,7 +38,6 @@
     "typescript": "^2.6.2"
   },
   "dependencies": {
-    "@types/file-type": "^5.2.1",
     "cheerio": "^1.0.0-rc.2",
     "detect-character-encoding": "^0.5.1",
     "file-type": "^7.4.0",
