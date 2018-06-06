@@ -1,11 +1,6 @@
-import {
-  Site,
-  SiteConfig,
-  SubmissionMetadata,
-  Submission,
-  Fetchable,
-  BasicFetchable
-} from "../common";
+import { Site, SiteConfig } from "../core/site";
+import { Fetchable, BasicFetchable } from "../core/fetchable";
+import { Submission, SubmissionMetadata } from "../core/submission";
 import { SITE } from "../plugin_registry";
 import * as cheerio from "cheerio";
 import * as request from "request";

@@ -1,18 +1,17 @@
+import { APP_JAVA_NAMESPACE } from "../common";
+import { Collection, CollectionConfig } from "../core/collection";
 import {
-  Collection,
-  CollectionConfig,
-  objectToMap,
   Submission,
   SubmissionIdentifier,
-  SubmissionMetadata,
-  APP_JAVA_NAMESPACE
-} from "../common";
+  SubmissionMetadata
+} from "../core/submission";
+import { objectToMap } from "../util/map";
 import { COLLECTION } from "../plugin_registry";
 import * as fs from "fs-extra";
 import * as xattr from "../util/xattr";
 import * as path from "path";
 import * as process from "process";
-import { processForOutput, processForInput } from "../filetypes/filetypes";
+import { processForOutput, processForInput } from "../core/filetypes";
 import { Schema } from "jsonschema";
 
 export interface FilesystemConfig extends CollectionConfig {

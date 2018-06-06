@@ -1,5 +1,7 @@
 import { Config } from "./config";
-import { Site, Collection, SiteConfig, CollectionConfig } from "./common";
+import { Site, SiteConfig } from "./core/site";
+import { FileTypeHandler } from "./core/filetypes";
+import { Collection, CollectionConfig } from "./core/collection";
 import { Schema, Validator } from "jsonschema";
 
 type PluginConstructor<C, T> = {
@@ -11,6 +13,7 @@ type CollectionConstructor = PluginConstructor<CollectionConfig, Collection>;
 
 const siteRegistry = new Map<string, [Schema, SiteConstructor]>();
 const collectionRegistry = new Map<string, [Schema, CollectionConstructor]>();
+const fileTypeRegistry = new Set<FileTypeHandler>();
 
 export function SITE(configSchema: Schema) {
   return (constructor: SiteConstructor) => {
@@ -19,6 +22,11 @@ export function SITE(configSchema: Schema) {
       constructor
     ]);
   };
+}
+
+export function FILETYPE(fileTypeHandler: FileTypeHandler) {
+  fileTypeRegistry.add(fileTypeHandler);
+  return fileTypeHandler;
 }
 
 export function COLLECTION(configSchema: Schema) {
@@ -68,4 +76,8 @@ export function makeCollection(
   configPath: string
 ): Collection {
   return makePlugin(name, config, configPath, collectionRegistry);
+}
+
+export function getFileTypes(): FileTypeHandler[] {
+  return Array.from(fileTypeRegistry);
 }

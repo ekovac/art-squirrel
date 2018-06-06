@@ -1,12 +1,12 @@
+import { FileTypeHandler } from "../core/filetypes";
+import { FILETYPE } from "../plugin_registry";
 import {
-  FiletypeHandler,
   makeStaticSubmission,
-  mapToObject,
-  objectToMap,
   Submission,
   SubmissionMetadata,
   SubmissionIdentifier
-} from "../common";
+} from "../core/submission";
+import { mapToObject, objectToMap } from "../util/map";
 import * as yaml from "js-yaml";
 
 interface YamlPrefix {
@@ -26,7 +26,7 @@ interface YamlSuffix {
   Keywords?: string[];
 }
 
-export const txt: FiletypeHandler = {
+export const txt: FileTypeHandler = FILETYPE({
   mimeTypes: ["text/plain"],
   async serializer(submission: Submission): Promise<Buffer> {
     const content = await (await submission.image()).content();
@@ -105,4 +105,4 @@ export const txt: FiletypeHandler = {
 
     return makeStaticSubmission(identifier, metadata, new Buffer(contentText));
   }
-};
+});

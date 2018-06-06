@@ -1,15 +1,15 @@
+import { FileTypeHandler } from "../core/filetypes";
+import { FILETYPE } from "../plugin_registry";
 import {
-  FiletypeHandler,
   makeStaticSubmission,
-  mapToObject,
-  objectToMap,
   Submission,
   SubmissionIdentifier
-} from "../common";
+} from "../core/submission";
+import { mapToObject, objectToMap } from "../util/map";
 
 import { PngImage } from "./png_helper";
 
-export const png: FiletypeHandler = {
+export const png: FileTypeHandler = FILETYPE({
   mimeTypes: ["image/png"],
   async serializer(submission: Submission): Promise<Buffer> {
     const content = await (await submission.image()).content();
@@ -56,4 +56,4 @@ export const png: FiletypeHandler = {
     };
     return makeStaticSubmission(identifier, metadata, content);
   }
-};
+});

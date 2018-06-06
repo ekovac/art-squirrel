@@ -1,14 +1,14 @@
+import { FileTypeHandler } from "../core/filetypes";
+import { FILETYPE } from "../plugin_registry";
 import {
-  FiletypeHandler,
-  makeStaticSubmission,
-  mapToObject,
-  objectToMap,
   Submission,
-  SubmissionIdentifier
-} from "../common";
+  SubmissionIdentifier,
+  makeStaticSubmission
+} from "../core/submission";
+import { mapToObject, objectToMap } from "../util/map";
 import * as piexif from "piexifjs";
 
-export const jpeg: FiletypeHandler = {
+export const jpeg: FileTypeHandler = FILETYPE({
   mimeTypes: ["image/jpeg"],
   async serializer(submission: Submission): Promise<Buffer> {
     const content = await (await submission.image()).content();
@@ -70,4 +70,4 @@ export const jpeg: FiletypeHandler = {
     };
     return makeStaticSubmission(identifier, metadata, content);
   }
-};
+});
