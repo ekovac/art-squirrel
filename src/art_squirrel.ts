@@ -1,9 +1,8 @@
 import { Config, PluginConfig, loadConfig } from "./config";
 import { makeSite, makeCollection } from "./plugin_registry";
-import { APPNAME } from "./common";
+import { APP_NAME } from "./common";
 import { Site } from "./core/site";
 import { Collection } from "./core/collection";
-import { Filesystem } from "./collections/filesystem";
 
 function makePlugins<T, S>(
   entries: PluginConfig[],

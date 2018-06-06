@@ -1,4 +1,4 @@
-import { APPNAME } from "./common";
+import { APP_NAME } from "./common";
 import * as osPath from "path";
 import * as fs from "fs";
 import * as jsonschema from "jsonschema";
@@ -45,7 +45,7 @@ validator.addSchema(pluginConfigSchema, pluginConfigSchema.id);
 
 export function loadConfig(): { config: Config; path: string } {
   const configSearchPaths = [
-    osPath.join(global.process.env.HOME, ".config", APPNAME, "config.json"),
+    osPath.join(global.process.env.HOME, ".config", APP_NAME, "config.json"),
     osPath.join(global.process.cwd(), "config.json")
   ];
   let config: Config;

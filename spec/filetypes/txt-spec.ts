@@ -15,7 +15,8 @@ describe("Text submission deserializer", () => {
     const submission = await txt.deserializer(fs.readFile(TEST_FILE_NAME));
     const document = await submission.image();
     const content = await document.content();
-    expect(content.toString()).toMatch(/^Lorem ipsum/);
+    expect(content.toString()).toMatch(/^Lorem ipsum/m);
+    expect(content.toString()).toMatch(/asperiores repellat.$/m);
   });
 
   it("should extract the title, author, and upload date", async () => {
