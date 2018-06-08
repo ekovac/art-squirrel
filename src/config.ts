@@ -1,33 +1,28 @@
-import { APP_NAME } from "./common";
-import * as osPath from "path";
-import * as fs from "fs";
-import * as jsonschema from "jsonschema";
+import * as fs from 'fs';
+import * as jsonschema from 'jsonschema';
+import * as osPath from 'path';
+
+import {APP_NAME} from './common';
 
 const validator = new jsonschema.Validator();
 
 const pluginConfigSchema: jsonschema.Schema = {
-  id: "/PluginConfig",
-  type: "object",
+  id: '/PluginConfig',
+  type: 'object',
   properties: {
-    type: { type: "string" },
-    name: { type: "string" },
-    config: { type: "object" }
+    type: {type: 'string'},
+    name: {type: 'string'},
+    config: {type: 'object'}
   },
-  required: ["type", "config"]
+  required: ['type', 'config']
 };
 
 const configSchema: jsonschema.Schema = {
-  id: "Config",
-  type: "object",
+  id: 'Config',
+  type: 'object',
   properties: {
-    sites: {
-      type: "array",
-      items: { $ref: pluginConfigSchema.id }
-    },
-    collections: {
-      type: "array",
-      items: { $ref: pluginConfigSchema.id }
-    }
+    sites: {type: 'array', items: {$ref: pluginConfigSchema.id}},
+    collections: {type: 'array', items: {$ref: pluginConfigSchema.id}}
   }
 };
 
@@ -43,43 +38,40 @@ export interface Config {
 
 validator.addSchema(pluginConfigSchema, pluginConfigSchema.id);
 
-export function loadConfig(): { config: Config; path: string } {
+export function loadConfig(): {config: Config; path: string} {
   const configSearchPaths = [
-    osPath.join(global.process.env.HOME, ".config", APP_NAME, "config.json"),
-    osPath.join(global.process.cwd(), "config.json")
+    osPath.join(global.process.env.HOME, '.config', APP_NAME, 'config.json'),
+    osPath.join(global.process.cwd(), 'config.json')
   ];
   let config: Config;
 
   for (const path of configSearchPaths) {
     let configContent: string;
     try {
-      configContent = fs.readFileSync(path, { encoding: "utf-8" });
+      configContent = fs.readFileSync(path, {encoding: 'utf-8'});
     } catch (e) {
-      continue; // Try next path.
+      continue;  // Try next path.
     }
     try {
       config = JSON.parse(configContent);
     } catch (e) {
       console.error(
-        "Tried to load config at %s, contained invalid JSON: %s",
-        path,
-        e
-      );
+          'Tried to load config at %s, contained invalid JSON: %s', path, e);
       process.abort();
     }
     const result = validator.validate(config, configSchema);
     if (!result.valid) {
-      console.error("Invalid configuration specified:");
+      console.error('Invalid configuration specified:');
       for (const error of result.errors) {
         console.error(error.message);
       }
       process.abort();
     }
-    return { config, path };
+    return {config, path};
   }
 
   if (!config) {
-    console.error("No valid configuration found.");
+    console.error('No valid configuration found.');
     process.abort();
   }
 }

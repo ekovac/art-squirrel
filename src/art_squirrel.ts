@@ -1,6 +1,5 @@
 import { Config, PluginConfig, loadConfig } from "./config";
 import { makeSite, makeCollection } from "./plugin_registry";
-import { APP_NAME } from "./common";
 import { Site } from "./core/site";
 import { Collection } from "./core/collection";
 

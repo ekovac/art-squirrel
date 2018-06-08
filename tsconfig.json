@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "target": "ES2017",
+    "target": "es2017",
     "noImplicitAny": true,
-    "lib": ["ES2017", "DOM", "esnext.asynciterable"],
+    "lib": ["es2017", "dom", "esnext.asynciterable"],
     "outDir": "./dist/",
     "module": "CommonJS",
     "moduleResolution": "node"

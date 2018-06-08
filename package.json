@@ -1,8 +1,7 @@
 {
   "name": "art-squirrel",
   "version": "0.0.1",
-  "description":
-    "A tool for backup, tagging, and deduplication of art site posts.",
+  "description": "A tool for backup, tagging, and deduplication of art site posts.",
   "main": "dist/src/index.js",
   "bin": {
     "art-squirrel": "./dist/src/index.js"
@@ -16,7 +15,12 @@
     "type": "git",
     "url": "/home/pkovac/src/../git/art-squirrel.git/"
   },
-  "keywords": ["furaffinity", "e621", "weasyl", "backup"],
+  "keywords": [
+    "furaffinity",
+    "e621",
+    "weasyl",
+    "backup"
+  ],
   "author": "Philip \"digitalfox\" Kovac <digitalfox@binaryden.net>",
   "license": "MIT",
   "devDependencies": {
@@ -41,8 +45,8 @@
     "cheerio": "^1.0.0-rc.2",
     "detect-character-encoding": "^0.5.1",
     "file-type": "^7.4.0",
+    "fs-extended-attributes": "^1.0.1",
     "fs-extra": "^4.0.3",
-    "fs-xattr": "^0.2.1",
     "js-yaml": "^3.11.0",
     "jsonschema": "^1.2.0",
     "moment": "^2.19.3",
