@@ -7,6 +7,11 @@ import * as request from "request";
 import * as moment from "moment";
 import * as requestPromise from "request-promise-native";
 import * as nodeUrl from "url";
+import * as nodeUtil from "util";
+import * as osPath from "path";
+import * as fs from "fs-extra";
+import * as FileCookieStore from "file-cookie-store";
+import { CookieJar } from "tough-cookie";
 import { Schema } from "jsonschema";
 
 export interface FuraffinityConfig extends SiteConfig {
@@ -170,7 +175,21 @@ class FavoritesPage extends FuraffinityFetchable {
 
 @SITE(CONFIG_SCHEMA)
 export class Furaffinity implements Site {
-  constructor(readonly config: FuraffinityConfig, readonly path: string) {}
+  private cookieJar: CookieJar;
+  private cookieString: string;
+  constructor(readonly config: FuraffinityConfig, readonly path: string) {
+    let cookieLocation = this.config.cookieLocation || "cookies.txt";
+    if (!osPath.isAbsolute(cookieLocation)) {
+      cookieLocation = osPath.join(osPath.dirname(this.path), cookieLocation);
+    }
+    this.cookieJar = new CookieJar(
+      new FileCookieStore(cookieLocation, {
+        auto_sync: false,
+        no_file_error: false
+      })
+    );
+  }
+
   private async *favoritePages(
     username: string
   ): AsyncIterableIterator<FavoritesPage> {
@@ -183,6 +202,9 @@ export class Furaffinity implements Site {
   }
 
   async *submissions(): AsyncIterableIterator<Submission> {
+    this.cookieString = await nodeUtil.promisify(
+      this.cookieJar.getCookieString
+    )(BASE_URL);
     for (const query of this.config.query) {
       if (query.lastIndexOf(":") != -1) {
         let [specialQueryType, parameter] = query.split(":", 2);
@@ -204,6 +226,9 @@ export class Furaffinity implements Site {
   }
 
   get headers(): request.Headers {
-    return { "User-Agent": USER_AGENT };
+    return {
+      "User-Agent": USER_AGENT,
+      Cookies: this.cookieString
+    };
   }
 }
