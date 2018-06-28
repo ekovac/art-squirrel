@@ -2,4 +2,5 @@ src/**/*.js
 *.swp
 node_modules/
 dist/
+test_data/test-out.jpg
 cookies.txt

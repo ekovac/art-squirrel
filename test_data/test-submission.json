@@ -1,0 +1,18 @@
+{
+  "identifier": {
+    "id": "12345",
+    "site": "example.com"
+  },
+  "metadata": {
+    "imageUrl": "https://example.com/image12345.jpg",
+    "title": "Test Submission",
+    "dateUploaded": "2018-06-27T02:17:09.817",
+    "artist": {
+      "name": "digitalfox",
+      "url": "https://example.com/~digitalfox/"
+    },
+    "tags": {
+      "keywords": []
+    }
+  }
+}
