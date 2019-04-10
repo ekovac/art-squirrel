@@ -1,62 +1,35 @@
 {
   "name": "art-squirrel",
   "version": "0.0.1",
-  "description": "A tool for backup, tagging, and deduplication of art site posts.",
-  "main": "dist/src/index.js",
-  "bin": {
-    "art-squirrel": "./dist/src/index.js"
-  },
+  "description": "A tool for backing up artwork from art sites",
+  "main": "index.js",
   "scripts": {
-    "prepublish": "tsc",
-    "test": "tsc; jasmine",
-    "clean": "rimraf dist/"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "/home/pkovac/src/../git/art-squirrel.git/"
+    "url": "git+https://github.com/pkovac/art-squirrel.git"
   },
   "keywords": [
-    "furaffinity",
-    "e621",
-    "weasyl",
-    "backup"
+    "furaffinity"
   ],
-  "author": "Philip \"digitalfox\" Kovac <digitalfox@binaryden.net>",
+  "author": "digifox <digitalfox@binaryden.net>",
   "license": "MIT",
-  "devDependencies": {
-    "@types/cheerio": "^0.22.5",
-    "@types/file-type": "^5.2.1",
-    "@types/fs-extra": "^4.0.5",
-    "@types/jasmine": "^2.8.7",
-    "@types/js-yaml": "^3.11.1",
-    "@types/jsonschema": "^1.1.1",
-    "@types/moment": "^2.13.0",
-    "@types/request": "^2.0.8",
-    "@types/request-promise-native": "^1.0.10",
-    "@types/tough-cookie": "^2.3.2",
-    "@types/yargs": "^8.0.2",
-    "jasmine": "^3.1.0",
-    "jasmine-ts-console-reporter": "^3.1.1",
-    "prettier": "^1.9.1",
-    "rimraf": "^2.6.2",
-    "typescript": "^2.6.2"
+  "bugs": {
+    "url": "https://github.com/pkovac/art-squirrel/issues"
   },
+  "homepage": "https://github.com/pkovac/art-squirrel#readme",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2",
-    "detect-character-encoding": "^0.5.1",
-    "file-cookie-store": "^0.2.1",
-    "file-type": "^7.4.0",
-    "fs-extended-attributes": "^1.0.1",
-    "fs-extra": "^4.0.3",
-    "js-yaml": "^3.11.0",
-    "jsonschema": "^1.2.0",
-    "moment": "^2.19.3",
-    "piexifjs": "^1.0.3",
-    "png-metadata": "^1.0.1",
-    "request": "^2.83.0",
-    "request-promise-native": "^1.0.5",
-    "tough-cookie": "^2.3.3",
-    "util.promisify": "^1.0.0",
-    "yargs": "^10.0.3"
+    "argparse": "^1.0.10",
+    "fs-extra": "^7.0.1",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/argparse": "^1.0.36",
+    "@types/argv": "0.0.4",
+    "@types/fs-extra": "^5.0.5",
+    "@types/request-promise-native": "^1.0.15",
+    "typescript": "^3.4.1"
   }
 }
