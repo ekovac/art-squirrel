@@ -2,9 +2,12 @@
   "name": "art-squirrel",
   "version": "0.0.1",
   "description": "A tool for backing up artwork from art sites",
-  "main": "index.js",
+  "main": "",
+  "bin": {
+    "art-squirrel": "./build/index.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "tsc"
   },
   "repository": {
     "type": "git",
@@ -21,6 +24,7 @@
   "homepage": "https://github.com/pkovac/art-squirrel#readme",
   "dependencies": {
     "argparse": "^1.0.10",
+    "fa.js": "git+https://github.com/pkovac/fa.js.git",
     "fs-extra": "^7.0.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7"
@@ -28,8 +32,10 @@
   "devDependencies": {
     "@types/argparse": "^1.0.36",
     "@types/argv": "0.0.4",
+    "@types/cheerio": "^0.22.11",
     "@types/fs-extra": "^5.0.5",
     "@types/request-promise-native": "^1.0.15",
+    "@types/superagent": "^4.1.1",
     "typescript": "^3.4.1"
   }
 }
