@@ -4,7 +4,7 @@
   "description": "A tool for backing up artwork from art sites",
   "main": "",
   "bin": {
-    "art-squirrel": "./build/index.js"
+    "art-squirrel": "./dist/index.js"
   },
   "scripts": {
     "prepare": "tsc"

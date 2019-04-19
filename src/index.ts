@@ -1,9 +1,9 @@
 import { FurAffinityClient, Submission } from "fa.js";
 import { ArgumentParser } from "argparse";
-import * as requestPromise from "request-promise-native";
-import * as fsExtra from "fs-extra";
-import * as path from "path";
-import * as process from "process";
+import requestPromise from "request-promise-native";
+import fsExtra from "fs-extra";
+import path from "path";
+import process from "process";
 
 const parser = new ArgumentParser();
 
