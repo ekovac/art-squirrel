@@ -143,7 +143,7 @@ async function main() {
       if (options.veryVerbose) {
         console.log(
           `Fetched submission ${submissionListing.id} (uploaded on ${
-            submission.upload_date
+            submission.when_title
           })`
         );
       }
