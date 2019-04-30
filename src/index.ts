@@ -118,16 +118,21 @@ async function main() {
       `${submissionListing.id}.data.json`
     );
 
+    submission.page_url = submissionListing.url;
+    delete submission.comments;
+    delete submission.body_text;
+    if (!submission.url) {
+      console.log(`Submission has no data URL: ${submission.page_url}`);
+      submissionsSkipped++;
+      continue;
+    }
     const writeImageToDiskPromise = requestPromise
       .get({
-        uri: submission.url,
+        uri: encodeURI(submission.url),
         encoding: null
       })
       .then((data: Buffer) => fsExtra.writeFile(imageOutputPath, data));
 
-    submission.page_url = submissionListing.url;
-    delete submission.comments;
-    delete submission.body_text;
 
     const writeJsonToDiskPromise = fsExtra.writeFile(
       jsonOutputPath,
