@@ -1,4 +1,4 @@
-import { FurAffinityClient, Submission } from "fa.js";
+import { FurAffinityClient, Submission } from "./furaffinity";
 import { ArgumentParser } from "argparse";
 import requestPromise from "request-promise-native";
 import fsExtra from "fs-extra";
@@ -143,7 +143,7 @@ async function main() {
       if (options.veryVerbose) {
         console.log(
           `Fetched submission ${submissionListing.id} (uploaded on ${
-            submission.upload_date
+            submission.when_title
           })`
         );
       }
