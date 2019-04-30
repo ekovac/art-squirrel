@@ -24,10 +24,12 @@
   "homepage": "https://github.com/pkovac/art-squirrel#readme",
   "dependencies": {
     "argparse": "^1.0.10",
-    "fa.js": "git+https://github.com/pkovac/fa.js.git",
+    "cheerio": "^1.0.0-rc.3",
     "fs-extra": "^7.0.1",
     "request": "^2.88.0",
-    "request-promise-native": "^1.0.7"
+    "request-promise-native": "^1.0.7",
+    "scrape-it": "^5.1.4",
+    "superagent": "^5.0.5"
   },
   "devDependencies": {
     "@types/argparse": "^1.0.36",

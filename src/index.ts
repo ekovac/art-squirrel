@@ -1,4 +1,4 @@
-import { FurAffinityClient, Submission } from "fa.js";
+import { FurAffinityClient, Submission } from "./furaffinity";
 import { ArgumentParser } from "argparse";
 import requestPromise from "request-promise-native";
 import fsExtra from "fs-extra";
