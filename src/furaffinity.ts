@@ -25,6 +25,7 @@ import * as cheerio from "cheerio";
 import * as fs from "fs";
 import * as scrape from "scrape-it";
 import * as superagent from "superagent";
+import { log } from "util";
 
 // TODO: Rate limiting and backoff error handling
 // TODO: Handle removed submissions/journals/etc
@@ -95,6 +96,19 @@ export class FurAffinityClient {
         };
     }
 
+    private static pickLinkByText(selector:string, text:string): scrape.ScrapeOptionElement {
+        return {
+            selector,
+            how: (elm: any) => {
+                const query = elm as Cheerio;
+                const children = query.map(console.log);
+                //console.log(children.attr('href'));
+                
+                return;
+            }
+        }
+    }
+
     private static pickLink(selector: string = "a") {
         return FurAffinityClient.pick(selector, "href");
     }
@@ -118,6 +132,10 @@ export class FurAffinityClient {
                 return sid.split("-")[1];
             }
         };
+    }
+
+    private static pickDownloadLink(selector: string = ".actions a") {
+        return FurAffinityClient.pickLinkByText(selector, 'Download');
     }
 
     constructor(private cookies: string) {
@@ -182,7 +200,7 @@ export class FurAffinityClient {
         return this.scrape<Submission>(`https://www.furaffinity.net/view/${id}/`, {
             "title": "#page-submission > table > tbody > tr:nth-child(1) > td > table > tbody > tr:nth-child(1) > th",
             "thumb": FurAffinityClient.pickImage("#submissionImg", "data-preview-src"),
-            "url": FurAffinityClient.pickImage("#submissionImg", "data-fullview-src"),
+            "url": FurAffinityClient.pickDownloadLink(),
             "artist": "#page-submission > table > tbody > tr:nth-child(1) > td > table > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(1) > td.cat > a",
             "artist_url": FurAffinityClient.pickLink("#page-submission > table > tbody > tr:nth-child(1) > td > table > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(1) > td.cat > a"),
             "artist_thumb": FurAffinityClient.pickImage("#page-submission > table > tbody > tr:nth-child(1) > td > table > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td > a:nth-child(1) > img"),
