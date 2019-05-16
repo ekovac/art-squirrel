@@ -42,4 +42,5 @@ const buildTest = (goldFileName: string): void => {
 
 fs.readdirSync(DATA_FOLDER)
     .filter(name => name.endsWith('.json'))
+    .sort()
     .map(buildTest);

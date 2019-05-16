@@ -11,9 +11,13 @@ export interface FavoritesPage {
 const scrapeDefinition = {
   'submissions': {
     'listItem': 'figure',
-    'attr': 'id',
-    convert: (sid: string) => {
-      return sid.split('-')[1];
+    'data': {
+      id: {
+        attr: 'id',
+        convert: (sid: string) => {
+          return sid.split('-')[1];
+        }
+      }
     }
   },
   'previousPage': {selector: 'a.button-link.left', attr: 'href'},
@@ -23,5 +27,6 @@ const scrapeDefinition = {
 export function scrapePage(content: string) {
   const doc = cheerio.load(content);
   const page = scrape.scrapeHTML<FavoritesPage>(doc, scrapeDefinition);
+  page.submissions = page.submissions.map((item: any) => item.id);
   return page;
 }

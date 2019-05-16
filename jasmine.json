@@ -1,8 +1,9 @@
 {
   "spec_files": [
     "src/spec/*.spec.ts"
-],
-"helpers": [
+  ],
+  "helpers": [
     "src/helpers/**/*.ts"
-]
+  ],
+  "random": false
 }
