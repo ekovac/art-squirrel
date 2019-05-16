@@ -15,8 +15,9 @@ const CORPUS = {
 
 const downloadCorpusEntry = ([outputName, url]) => {
   const outputFile = path.join(OUTPUT_DIRECTORY, outputName + '.html');
-  return fetch(url).then(
-      res => fs.promises.writeFile(outputFile, res.buffer()));
+  return fetch(url)
+      .then(res => res.buffer())
+      .then(buffer => fs.promises.writeFile(outputFile, buffer));
 };
 
 Promise.all(Object.entries(CORPUS).map(downloadCorpusEntry));
