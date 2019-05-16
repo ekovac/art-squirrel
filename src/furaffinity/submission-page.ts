@@ -39,7 +39,7 @@ const scrapeDefinition = {
   downloadUrl: {selector: 'a:contains("Download")', attr: 'href'}
 }
 
-export function scrapeSubmissionPage(content: string) {
+export function scrapePage(content: string) {
   const doc = cheerio.load(content);
   const page = scrape.scrapeHTML<SubmissionPage>(doc, scrapeDefinition);
   page.site = 'furaffinity';

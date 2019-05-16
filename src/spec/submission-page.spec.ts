@@ -2,7 +2,7 @@ import 'jasmine';
 
 import fsExtra from 'fs-extra';
 
-import {scrapeSubmissionPage, SubmissionPage} from '../src/furaffinity/submission-page';
+import {scrapePage, SubmissionPage} from '../furaffinity/submission-page';
 
 describe('scrapeSubmissionPage', () => {
   let fileContent: string;
@@ -24,7 +24,7 @@ describe('scrapeSubmissionPage', () => {
     beforeEach(() => {
       fileContent = fsExtra.readFileSync(
           'test_data/submission-image.html', {encoding: 'utf-8'});
-      submissionPage = scrapeSubmissionPage(fileContent);
+      submissionPage = scrapePage(fileContent);
     });
 
     describe('should scrape', () => {
@@ -55,7 +55,7 @@ describe('scrapeSubmissionPage', () => {
     beforeEach(() => {
       fileContent = fsExtra.readFileSync(
           'test_data/submission-txt.html', {encoding: 'utf-8'});
-      submissionPage = scrapeSubmissionPage(fileContent);
+      submissionPage = scrapePage(fileContent);
     });
 
     describe('should scrape', () => {

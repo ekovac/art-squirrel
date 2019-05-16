@@ -8,6 +8,8 @@
   },
   "scripts": {
     "test": "ts-node node_modules/jasmine/bin/jasmine --config=jasmine.json --reporter=jasmine-console-reporter",
+    "generate-gold-files": "ts-node src/generate-gold-files.ts",
+    "download-test-corpus": "ts-node src/download-test-corpus.ts",
     "prepare": "tsc"
   },
   "repository": {

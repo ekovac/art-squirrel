@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const fetch = require('node-fetch');
+const nodeFetch = require('node-fetch');
 const path = require('path');
 
 const OUTPUT_DIRECTORY = 'test_data';
@@ -13,11 +13,11 @@ const CORPUS = {
       'http://www.furaffinity.net/favorites/digitalfox/616571786/next'
 };
 
-const downloadCorpusEntry = ([outputName, url]) => {
+const downloadCorpusEntry = ([outputName, url]: [string, string]) => {
   const outputFile = path.join(OUTPUT_DIRECTORY, outputName + '.html');
-  return fetch(url)
-      .then(res => res.buffer())
-      .then(buffer => fs.promises.writeFile(outputFile, buffer));
+  return nodeFetch(url)
+      .then((res: any) => res.buffer())
+      .then((buffer: Buffer) => fs.promises.writeFile(outputFile, buffer));
 };
 
 Promise.all(Object.entries(CORPUS).map(downloadCorpusEntry));

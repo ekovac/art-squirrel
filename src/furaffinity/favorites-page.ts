@@ -16,11 +16,11 @@ const scrapeDefinition = {
       return sid.split('-')[1];
     }
   },
+  'previousPage': {selector: 'a.button-link.left', attr: 'href'},
   'nextPage': {selector: 'a.button-link.right', attr: 'href'},
-  'previousPage': {selector: 'a.button-link.right', attr: 'href'},
-}
+};
 
-export function scrapeFavoritesPage(content: string) {
+export function scrapePage(content: string) {
   const doc = cheerio.load(content);
   const page = scrape.scrapeHTML<FavoritesPage>(doc, scrapeDefinition);
   return page;
