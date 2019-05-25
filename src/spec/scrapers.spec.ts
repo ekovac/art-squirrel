@@ -17,30 +17,42 @@ const SCRAPERS: {[key: string]: ScraperFunction|undefined} = {
   submission: scrapeSubmission,
 };
 
-const buildTest = (goldFileName: string): void => {
+const buildTest = (scraper: ScraperFunction, goldFileName: string): void => {
   const goldFilePath = path.join(DATA_FOLDER, goldFileName);
   const [goldFileBaseName, ext] = goldFileName.split('.');
-  const [mainType, subType] = goldFileBaseName.split('-');
+  const [unused, subType] = goldFileBaseName.split('-');
   const testFilePath = path.join(DATA_FOLDER, goldFileBaseName + '.html');
   const goldObject =
       JSON.parse(fs.readFileSync(goldFilePath, {encoding: 'utf-8'}));
   const testContent = fs.readFileSync(testFilePath, {encoding: 'utf-8'});
-  const scraper = SCRAPERS[mainType];
   if (scraper) {
     const testObject = scraper(testContent);
-    describe(`${mainType} scraper`, () => {
-      describe(`parsing ${subType} pages`, () => {
-        for (const key of Object.keys(goldObject)) {
-          it(`should extract ${key}`, () => {
-            expect(testObject[key]).toEqual(goldObject[key]);
-          });
-        }
-      });
+    describe(`parsing ${subType} pages`, () => {
+      for (const key of Object.keys(goldObject)) {
+        it(`should extract ${key}`, () => {
+          expect(testObject[key]).toEqual(goldObject[key]);
+        });
+      }
     });
   }
 };
 
-fs.readdirSync(DATA_FOLDER)
-    .filter(name => name.endsWith('.json'))
-    .sort()
-    .map(buildTest);
+
+const goldFiles =
+    fs.readdirSync(DATA_FOLDER).filter(name => name.endsWith('.json')).sort();
+
+describe('Submission scraper', () => {
+  const submissionGoldFiles =
+      goldFiles.filter(name => name.startsWith('submission'));
+  for (const goldFile of submissionGoldFiles) {
+    buildTest(scrapeSubmission, goldFile);
+  }
+});
+
+describe('Favorites scraper', () => {
+  const favoritesGoldFiles =
+      goldFiles.filter(name => name.startsWith('favorites'));
+  for (const goldFile of favoritesGoldFiles) {
+    buildTest(scrapeFavorites, goldFile)
+  }
+});
