@@ -122,8 +122,8 @@ async function main() {
       submissionsSkipped++;
       continue;
     }
-    const fixedDownloadUrl = encodeURI(
-        url.resolve('https://www.furaffinity.com', submission.downloadUrl));
+    const fixedDownloadUrl =
+        url.resolve('https://www.furaffinity.com', submission.downloadUrl);
     const writeImageToDiskPromise =
         fetch(encodeURI(fixedDownloadUrl), requestOptions)
             .then(response => response.buffer())
