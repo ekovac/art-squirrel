@@ -14,6 +14,7 @@ export interface SubmissionPage {
   folders: string[];
   keywords: string[];
   downloadUrl: string;
+  sourceUrl: string;
   rating: string;
 }
 
@@ -36,7 +37,7 @@ const scrapeDefinition = {
   keywords: {listItem: '#keywords > a'},
   rating: {selector: 'td.stats-container img', attr: 'alt'},
   downloadUrl: {selector: 'a:contains("Download")', attr: 'href'}
-}
+};
 
 export function scrapePage(content: string) {
   const doc = cheerio.load(content);

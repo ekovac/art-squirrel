@@ -1,76 +1,78 @@
-import { FurAffinityClient, Submission } from "./furaffinity";
-import { ArgumentParser } from "argparse";
-import requestPromise from "request-promise-native";
-import fsExtra from "fs-extra";
-import path from "path";
-import process from "process";
+import {ArgumentParser} from 'argparse';
+import fileType from 'file-type';
+import fsExtra from 'fs-extra';
+import fetch, {RequestInit} from 'node-fetch';
+import path from 'path';
+import process from 'process';
+import url from 'url';
+
+import {getFavoritesIds, getSubmissionPage, SubmissionPage} from './furaffinity/index';
 
 const parser = new ArgumentParser();
 
-parser.addArgument(["-c", "--cookies"], {
+parser.addArgument(['-c', '--cookies'], {
   help:
-    'Path to a JSON file containing the "a" and "b" auth cookies from Furaffinity.',
+      'Path to a JSON file containing the "a" and "b" auth cookies from Furaffinity.',
   required: true,
   type: String
 });
 
-parser.addArgument(["-d", "--destination"], {
-  help: "Path to a folder in which to store submissions",
-  defaultValue: ".",
+parser.addArgument(['-d', '--destination'], {
+  help: 'Path to a folder in which to store submissions',
+  defaultValue: '.',
   type: String
 });
 
-parser.addArgument(["-f", "--force"], {
+parser.addArgument(['-u', '--user'], {
+  help: 'Furaffinity user to fetch favorites from.',
+  required: true,
+  type: String,
+});
+
+parser.addArgument(['-f', '--force'], {
   help:
-    "Continue fetching submissions even after encountering an already fetched one ",
-  action: "storeTrue"
+      'Continue fetching submissions even after encountering an already fetched one ',
+  action: 'storeTrue'
 });
 
-parser.addArgument(["-F", "--forceAll"], {
-  help: "Fetch all submissions, even those we have already downloaded.",
-  action: "storeTrue"
+parser.addArgument(['-F', '--forceAll'], {
+  help: 'Fetch all submissions, even those we have already downloaded.',
+  action: 'storeTrue'
 });
 
-parser.addArgument(["-v", "--verbose"], {
-  help: "Output the number of submissions fetched.",
-  action: "storeTrue"
-});
+parser.addArgument(
+    ['-v', '--verbose'],
+    {help: 'Output the number of submissions fetched.', action: 'storeTrue'});
 
-parser.addArgument(["-V", "--veryVerbose"], {
-  help: "Output the IDs of each submission fetched.",
-  action: "storeTrue"
-});
+parser.addArgument(
+    ['-V', '--veryVerbose'],
+    {help: 'Output the IDs of each submission fetched.', action: 'storeTrue'});
 
-parser.addArgument(["--delay"], {
-  help: "Delay between requests, in milliseconds.",
-  defaultValue: 1000
-});
+parser.addArgument(
+    ['--delay'],
+    {help: 'Delay between requests, in milliseconds.', defaultValue: 1000});
 
 const options = parser.parseArgs();
 
-const cookies: { a: string; b: string } = JSON.parse(
-  fsExtra.readFileSync(options.cookies).toString()
-);
-
-const faClient = new FurAffinityClient(`a=${cookies.a};b=${cookies.b};s=1`);
+const cookies: {a: string; b: string} =
+    JSON.parse(fsExtra.readFileSync(options.cookies).toString());
 
 function delay() {
   return new Promise<void>(resolve => setTimeout(resolve, options.delay));
 }
 
 function basename(s: string) {
-  const index = s.lastIndexOf(".");
+  const index = s.lastIndexOf('.');
   return index == -1 ? s : s.substr(0, index);
 }
 
-async function checkForId(submissionId: string | number): Promise<boolean> {
+async function checkForId(submissionId: string|number): Promise<boolean> {
   const filenames = await fsExtra.readdir(options.destination);
   const matchingFilenames = filenames.filter(filename => {
     const base = basename(filename);
     return (
-      base == submissionId.toString() ||
-      base == submissionId.toString() + ".data"
-    );
+        base == submissionId.toString() ||
+        base == submissionId.toString() + '.data');
   });
   return matchingFilenames.length >= 2;
 }
@@ -86,16 +88,20 @@ function registerSignalHandler(signal: any) {
   });
 }
 
-registerSignalHandler("SIGINT");
-registerSignalHandler("SIGTERM");
+registerSignalHandler('SIGINT');
+registerSignalHandler('SIGTERM');
 
 async function main() {
   let submissionsFetched = 0;
   let submissionsSkipped = 0;
 
-  for await (const submissionListing of faClient.getFavorites("digitalfox")) {
+  const requestOptions:
+      RequestInit = {headers: {'Cookie': `a=${cookies.a};b=${cookies.b};s=1`}};
+
+  for await (
+      const submissionId of getFavoritesIds(options.user, requestOptions)) {
     if (shouldBreak) break;
-    if (!options.forceAll && (await checkForId(submissionListing.id))) {
+    if (!options.forceAll && (await checkForId(submissionId))) {
       if (options.force) {
         submissionsSkipped++;
         continue;
@@ -105,59 +111,59 @@ async function main() {
     }
 
     await delay();
-    const submission: Submission & {
-      page_url?: string;
-    } = await faClient.getSubmission(submissionListing.id);
-    const extension = path.extname(submission.url);
-    const imageOutputPath = path.join(
-      options.destination,
-      `${submissionListing.id}${extension}`
-    );
-    const jsonOutputPath = path.join(
-      options.destination,
-      `${submissionListing.id}.data.json`
-    );
+    const submission: SubmissionPage =
+        await getSubmissionPage(submissionId, requestOptions);
 
-    submission.page_url = submissionListing.url;
-    delete submission.comments;
-    delete submission.body_text;
-    if (!submission.url) {
-      console.log(`Submission has no data URL: ${submission.page_url}`);
+    const jsonOutputPath =
+        path.join(options.destination, `${submissionId}.data.json`);
+
+    if (!submission.downloadUrl) {
+      console.log(`Submission ${submissionId} has no download URL.`);
       submissionsSkipped++;
       continue;
     }
-    const writeImageToDiskPromise = requestPromise
-      .get({
-        uri: encodeURI(submission.url),
-        encoding: null
-      })
-      .then((data: Buffer) => fsExtra.writeFile(imageOutputPath, data));
+    const fixedDownloadUrl = encodeURI(
+        url.resolve('https://www.furaffinity.com', submission.downloadUrl));
+    const writeImageToDiskPromise =
+        fetch(encodeURI(fixedDownloadUrl), requestOptions)
+            .then(response => response.buffer())
+            .then((data: Buffer) => {
+              const sourceExtension = path.extname(submission.downloadUrl);
+              let extension: string;
+              const fileTypeGuess = fileType(data);
+              if (!fileTypeGuess) {
+                extension = sourceExtension || '';
+                if (options.veryVerbose) {
+                  console.info(`Could not guess fileType for submission ${
+                      submissionId}, with URL ${
+                      path.basename(submission.downloadUrl)}`);
+                }
+              } else {
+                extension = '.' + fileTypeGuess.ext;
+              }
+              const downloadOutputPath =
+                  path.join(options.destination, `${submissionId}${extension}`);
+              fsExtra.writeFile(downloadOutputPath, data)
+            });
 
 
-    const writeJsonToDiskPromise = fsExtra.writeFile(
-      jsonOutputPath,
-      JSON.stringify(submission)
-    );
+    const writeJsonToDiskPromise =
+        fsExtra.writeFile(jsonOutputPath, JSON.stringify(submission));
 
-    await Promise.all([
-      delay(),
-      writeImageToDiskPromise,
-      writeJsonToDiskPromise
-    ]).then(unusedVoids => {
-      submissionsFetched++;
-      if (options.veryVerbose) {
-        console.log(
-          `Fetched submission ${submissionListing.id} (uploaded on ${
-            submission.when_title
-          })`
-        );
-      }
-    });
+    await Promise
+        .all([delay(), writeImageToDiskPromise, writeJsonToDiskPromise])
+        .then(unusedVoids => {
+          submissionsFetched++;
+          if (options.veryVerbose) {
+            console.info(`Fetched submission ${submissionId} (uploaded on ${
+                submission.posted})`);
+          }
+        });
   }
 
   if (options.verbose) {
-    console.log(`Submissions fetched: ${submissionsFetched}`);
-    console.log(`Submissions skipped: ${submissionsSkipped}`);
+    console.info(`Submissions fetched: ${submissionsFetched}`);
+    console.info(`Submissions skipped: ${submissionsSkipped}`);
   }
   return;
 }

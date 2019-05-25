@@ -28,23 +28,19 @@
   "dependencies": {
     "argparse": "^1.0.10",
     "cheerio": "^0.22.0",
+    "file-type": "^11.1.0",
     "fs-extra": "^7.0.1",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
-    "scrape-it": "^5.1.4",
-    "superagent": "^5.0.5"
+    "scrape-it": "^5.1.4"
   },
   "devDependencies": {
     "@types/argparse": "^1.0.36",
-    "@types/argv": "0.0.4",
     "@types/cheerio": "^0.22.11",
     "@types/fs-extra": "^5.0.5",
     "@types/jasmine": "^3.3.12",
-    "@types/request-promise-native": "^1.0.15",
-    "@types/superagent": "^4.1.1",
+    "@types/node-fetch": "^2.3.4",
     "jasmine": "^3.4.0",
     "jasmine-console-reporter": "^3.1.0",
-    "node-fetch": "^2.5.0",
+    "node-fetch": "^2.6.0",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.1"
   }

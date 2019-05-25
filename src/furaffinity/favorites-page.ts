@@ -20,8 +20,8 @@ const scrapeDefinition = {
       }
     }
   },
-  'previousPage': {selector: 'a.button-link.left', attr: 'href'},
-  'nextPage': {selector: 'a.button-link.right', attr: 'href'},
+  'previousPageUrl': {selector: 'a.button-link.left', attr: 'href'},
+  'nextPageUrl': {selector: 'a.button-link.right', attr: 'href'},
 };
 
 export function scrapePage(content: string) {
