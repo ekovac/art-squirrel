@@ -28,7 +28,6 @@ const scrapeDefinition = {
   title: '.classic-submission-title.information h2',
   artist: '.classic-submission-title.information a',
   description: {selector: 'td[width="70%"]', how: 'html'},
-  //{selector: 'td.alt1[style="padding:8px"]', how: extractDescription},
   posted: {
     selector: '#page-submission td.stats-container span.popup_date',
     attr: 'title'
