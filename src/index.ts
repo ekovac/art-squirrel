@@ -94,6 +94,7 @@ registerSignalHandler('SIGTERM');
 async function main() {
   let submissionsFetched = 0;
   let submissionsSkipped = 0;
+  let submissionsErrors = 0;
 
   const requestOptions:
       RequestInit = {headers: {'Cookie': `a=${cookies.a};b=${cookies.b};s=1`}};
@@ -122,33 +123,43 @@ async function main() {
         path.join(options.destination, `${submissionId}.data.json`);
 
     if (!submission.downloadUrl) {
-      console.log(`Submission ${submissionId} has no download URL.`);
-      submissionsSkipped++;
+      console.error(`Submission ${submissionId} has no download URL.`);
+      submissionsErrors++;
       continue;
     }
     const fixedDownloadUrl =
         url.resolve('https://www.furaffinity.com', submission.downloadUrl);
     const writeImageToDiskPromise =
         fetch(encodeURI(fixedDownloadUrl), requestOptions)
-            .then(response => response.buffer())
-            .then((data: Buffer) => {
-              const sourceExtension = path.extname(submission.downloadUrl);
-              let extension: string;
-              const fileTypeGuess = fileType(data);
-              if (!fileTypeGuess) {
-                extension = sourceExtension || '';
-                if (options.veryVerbose) {
-                  console.info(`Could not guess fileType for submission ${
-                      submissionId}, with URL ${
-                      path.basename(submission.downloadUrl)}`);
-                }
-              } else {
-                extension = '.' + fileTypeGuess.ext;
+            .then(response => {
+              if (response.status !== 200) {
+                throw Error(`Failed to download submission ${
+                    submissionId}: HTTP ${response.status}`);
               }
-              const downloadOutputPath =
-                  path.join(options.destination, `${submissionId}${extension}`);
-              fsExtra.writeFile(downloadOutputPath, data)
-            });
+              return response.buffer()
+            })
+            .then(
+                (data: Buffer) => {
+                  const sourceExtension = path.extname(submission.downloadUrl);
+                  let extension: string;
+                  const fileTypeGuess = fileType(data);
+                  if (!fileTypeGuess) {
+                    extension = sourceExtension || '';
+                    if (options.veryVerbose) {
+                      console.info(`Could not guess fileType for submission ${
+                          submissionId}, with URL ${
+                          path.basename(submission.downloadUrl)}`);
+                    }
+                  } else {
+                    extension = '.' + fileTypeGuess.ext;
+                  }
+                  const downloadOutputPath = path.join(
+                      options.destination, `${submissionId}${extension}`);
+                  fsExtra.writeFile(downloadOutputPath, data)
+                },
+                reason => {
+                  console.error(reason);
+                });
 
 
     const writeJsonToDiskPromise =
@@ -168,6 +179,7 @@ async function main() {
   if (options.verbose) {
     console.info(`Submissions fetched: ${submissionsFetched}`);
     console.info(`Submissions skipped: ${submissionsSkipped}`);
+    console.info(`Submissions with errors: ${submissionsErrors}`)
   }
   return;
 }
