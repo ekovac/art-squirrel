@@ -103,6 +103,10 @@ async function main() {
     if (shouldBreak) break;
     if (!options.forceAll && (await checkForId(submissionId))) {
       if (options.force) {
+        if (options.veryVerbose) {
+          console.log(
+              `Skipped submission ${submissionId}; already downloaded.`);
+        }
         submissionsSkipped++;
         continue;
       } else {
