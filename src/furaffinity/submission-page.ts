@@ -26,17 +26,17 @@ function extractDescription(element: CheerioSelector) {
 }
 
 const scrapeDefinition = {
-  title: '.classic-submission-title.information h2',
-  artist: '.classic-submission-title.information a',
-  description: {selector: 'td[width="70%"]', how: 'html'},
+  title: '.submission-title h2',
+  artist: '.submission-id-sub-container a strong',
+  description: { selector: '.submission-description', how: 'html' },
   posted: {
-    selector: '#page-submission td.stats-container span.popup_date',
+    selector: '.submission-id-sub-container span.popup_date',
     attr: 'title'
   },
-  folders: {listItem: '.folder-list-container a'},
-  keywords: {listItem: '#keywords > a'},
-  rating: {selector: 'td.stats-container img', attr: 'alt'},
-  downloadUrl: {selector: 'a:contains("Download")', attr: 'href'}
+  folders: { listItem: '.folder-list-container a' },
+  keywords: { listItem: 'section.tags-mobile .tags' },
+  rating: { selector: '.submission-content .rating .rating-box.inline' },
+  downloadUrl: { selector: 'a:contains("Download")', attr: 'href' }
 };
 
 export function scrapePage(content: string) {
