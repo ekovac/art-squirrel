@@ -30,7 +30,7 @@
     "cheerio": "^0.22.0",
     "file-type": "^11.1.0",
     "fs-extra": "^7.0.1",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.7",
     "scrape-it": "^5.1.4"
   },
   "devDependencies": {
