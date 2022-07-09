@@ -30,9 +30,8 @@
     "cheerio": "^1.0.0-rc.12",
     "file-type": "^11.1.0",
     "fs-extra": "^10.1.0",
-    "node-fetch": "^3.2.6",
     "scrape-it": "^5.3.2",
-    "twitter-api-v2": "^1.12.3"
+    "twitter-api-sdk": "^1.0.9"
   },
   "devDependencies": {
     "@types/argparse": "^1.0.36",

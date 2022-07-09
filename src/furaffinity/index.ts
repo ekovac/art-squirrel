@@ -1,6 +1,4 @@
-import { RequestOptions } from "https";
 import fileType from 'file-type';
-import fetch, { RequestInfo, RequestInit } from "node-fetch";
 import url from "url";
 import path from "path";
 
@@ -201,10 +199,11 @@ export const executeFetch = async (options: any) => {
               `Failed to download submission ${submissionId}: HTTP ${response.status}`,
             );
           }
-          return response.buffer();
+          return response.arrayBuffer();
         })
         .then(
-          (data: Buffer) => {
+          (arrayBuffer: ArrayBuffer) => {
+            const data = Buffer.from(arrayBuffer);
             const sourceExtension = path.extname(submission.downloadUrl);
             let extension: string;
             const fileTypeGuess = fileType(data);

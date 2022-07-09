@@ -1,14 +1,9 @@
 import {ArgumentParser} from 'argparse';
-import fileType from 'file-type';
-import fsExtra from 'fs-extra';
-import fetch, {RequestInit} from 'node-fetch';
-import path from 'path';
-import process from 'process';
-import url from 'url';
 
 import * as Furaffinity from './furaffinity/index';
+import * as Twitter from './twitter/index';
 
-const modules = [Furaffinity.module];
+const modules = [Furaffinity.module, Twitter.module];
 
 const parser = new ArgumentParser({
   prog: 'art-squirrel',
