@@ -18,13 +18,6 @@ export interface SubmissionPage {
   rating: string;
 }
 
-function extractDescription(element: CheerioSelector) {
-  const html = (element as any as Cheerio).html() || '';
-  // The artist icon/portrait are separated from the description by two
-  // linebreaks and a newline.
-  return html.split('<br><br>\n')[1];
-}
-
 const scrapeDefinition = {
   title: '.submission-title h2',
   artist: '.submission-id-sub-container a strong',
