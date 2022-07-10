@@ -29,13 +29,11 @@
     "argparse": "^1.0.10",
     "cheerio": "^1.0.0-rc.12",
     "file-type": "^11.1.0",
-    "fs-extra": "^10.1.0",
     "scrape-it": "^5.3.2",
     "twitter-api-sdk": "^1.0.9"
   },
   "devDependencies": {
     "@types/argparse": "^1.0.36",
-    "@types/fs-extra": "^9.0.13",
     "@types/jasmine": "^3.3.12",
     "jasmine": "^3.4.0",
     "jasmine-console-reporter": "^3.1.0",

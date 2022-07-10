@@ -12,7 +12,8 @@ import {
 } from "./submission-page";
 export { SubmissionPage } from "./submission-page";
 import { ArgumentParser } from "argparse";
-import fsExtra from "fs-extra";
+import { readdir, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 
 export function setupParser(parser: ArgumentParser) {
   parser.addArgument(["-c", "--cookies"], {
@@ -102,10 +103,6 @@ async function* getFavoritesIds(
 }
 
 export const executeFetch = async (options: any) => {
-  const cookies: { a: string; b: string } = JSON.parse(
-    fsExtra.readFileSync(options.cookies).toString(),
-  );
-
   function delay() {
     return new Promise<void>((resolve) => setTimeout(resolve, options.delay));
   }
@@ -116,7 +113,7 @@ export const executeFetch = async (options: any) => {
   }
 
   async function checkForId(submissionId: string | number): Promise<boolean> {
-    const filenames = await fsExtra.readdir(options.destination);
+    const filenames = await readdir(options.destination);
     const matchingFilenames = filenames.filter((filename) => {
       const base = basename(filename);
       return (
@@ -145,6 +142,10 @@ export const executeFetch = async (options: any) => {
     let submissionsFetched = 0;
     let submissionsSkipped = 0;
     let submissionsErrors = 0;
+
+    const cookies: { a: string; b: string } = JSON.parse(
+      readFileSync(options.cookies).toString(),
+    );
 
     const requestOptions: RequestInit = {
       headers: { Cookie: `a=${cookies.a};b=${cookies.b};s=1` },
@@ -223,14 +224,14 @@ export const executeFetch = async (options: any) => {
               options.destination,
               `${submissionId}${extension}`,
             );
-            fsExtra.writeFile(downloadOutputPath, data);
+            writeFile(downloadOutputPath, data);
           },
           (reason) => {
             console.error(reason);
           },
         );
 
-      const writeJsonToDiskPromise = fsExtra.writeFile(
+      const writeJsonToDiskPromise = writeFile(
         jsonOutputPath,
         JSON.stringify(submission),
       );
