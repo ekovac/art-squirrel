@@ -29,7 +29,7 @@
     "argparse": "^1.0.10",
     "cheerio": "^1.0.0-rc.12",
     "file-type": "^11.1.0",
-    "scrape-it": "^5.3.2",
+    "scrape-it": "^6.0.1",
     "twitter-api-sdk": "^1.0.9"
   },
   "devDependencies": {
