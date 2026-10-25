@@ -1,4 +1,4 @@
-import fileType from 'file-type';
+import { fileTypeFromBuffer } from 'file-type';
 import url from "url";
 import path from "path";
 
@@ -16,49 +16,49 @@ import { readdir, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 
 export function setupParser(parser: ArgumentParser) {
-  parser.addArgument(["-c", "--cookies"], {
+  parser.add_argument("-c", "--cookies", {
     help:
       'Path to a JSON file containing the "a" and "b" auth cookies from Furaffinity.',
     required: true,
     type: String,
   });
 
-  parser.addArgument(["-d", "--destination"], {
+  parser.add_argument("-d", "--destination", {
     help: "Path to a folder in which to store submissions",
-    defaultValue: ".",
+    default: ".",
     type: String,
   });
 
-  parser.addArgument(["-u", "--user"], {
+  parser.add_argument("-u", "--user", {
     help: "Furaffinity user to fetch favorites from.",
     required: true,
     type: String,
   });
 
-  parser.addArgument(["-f", "--force"], {
+  parser.add_argument("-f", "--force", {
     help:
       "Continue fetching submissions even after encountering an already fetched one ",
-    action: "storeTrue",
+    action: "store_true",
   });
 
-  parser.addArgument(["-F", "--forceAll"], {
+  parser.add_argument("-F", "--forceAll", {
     help: "Fetch all submissions, even those we have already downloaded.",
-    action: "storeTrue",
+    action: "store_true",
   });
 
-  parser.addArgument(["-v", "--verbose"], {
+  parser.add_argument("-v", "--verbose", {
     help: "Output the number of submissions fetched.",
-    action: "storeTrue",
+    action: "store_true",
   });
 
-  parser.addArgument(["-V", "--veryVerbose"], {
+  parser.add_argument("-V", "--veryVerbose", {
     help: "Output the IDs of each submission fetched.",
-    action: "storeTrue",
+    action: "store_true",
   });
 
-  parser.addArgument(["--delay"], {
+  parser.add_argument("--delay", {
     help: "Delay between requests, in milliseconds.",
-    defaultValue: 1000,
+    default: 1000,
   });
 }
 
@@ -203,11 +203,11 @@ export const executeFetch = async (options: any) => {
           return response.arrayBuffer();
         })
         .then(
-          (arrayBuffer: ArrayBuffer) => {
+          async (arrayBuffer: ArrayBuffer) => {
             const data = Buffer.from(arrayBuffer);
             const sourceExtension = path.extname(submission.downloadUrl);
             let extension: string;
-            const fileTypeGuess = fileType(data);
+            const fileTypeGuess = await fileTypeFromBuffer(data);
             if (!fileTypeGuess) {
               extension = sourceExtension || "";
               if (options.veryVerbose) {

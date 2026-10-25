@@ -7,9 +7,9 @@
     "art-squirrel": "./dist/index.js"
   },
   "scripts": {
-    "test": "ts-node node_modules/jasmine/bin/jasmine --config=jasmine.json --reporter=jasmine-console-reporter",
-    "generate-gold-files": "ts-node src/generate-gold-files.ts",
-    "download-test-corpus": "ts-node src/download-test-corpus.ts",
+    "test": "tsx node_modules/jasmine/bin/jasmine --config=jasmine.json --reporter=jasmine-console-reporter",
+    "generate-gold-files": "tsx src/generate-gold-files.ts",
+    "download-test-corpus": "tsx src/download-test-corpus.ts",
     "prepare": "tsc"
   },
   "repository": {
@@ -26,18 +26,21 @@
   },
   "homepage": "https://github.com/pkovac/art-squirrel#readme",
   "dependencies": {
-    "argparse": "^1.0.10",
-    "cheerio": "^1.0.0-rc.12",
-    "file-type": "^11.1.0",
-    "scrape-it": "^5.3.2",
-    "twitter-api-sdk": "^1.0.9"
+    "argparse": "^3.0.4",
+    "cheerio": "^1.2.0",
+    "file-type": "^22.2.0",
+    "scrape-it": "^6.1.16",
+    "twitter-api-sdk": "^1.2.1"
   },
   "devDependencies": {
-    "@types/argparse": "^1.0.36",
-    "@types/jasmine": "^3.3.12",
-    "jasmine": "^3.4.0",
+    "@types/jasmine": "^7.0.0",
+    "@types/node": "^26.6.5",
+    "jasmine": "^7.0.0",
     "jasmine-console-reporter": "^3.1.0",
-    "ts-node": "^8.1.0",
-    "typescript": "^4.7.4"
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }

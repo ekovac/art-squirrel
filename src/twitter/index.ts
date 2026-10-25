@@ -2,7 +2,7 @@ import { ArgumentParser } from "argparse";
 
 
 function setupParser(parser: ArgumentParser) {
-  parser.addArgument(["-k", "--key"], {
+  parser.add_argument("-k", "--key", {
     required: true, type: String}
   );
 }

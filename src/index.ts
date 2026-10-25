@@ -10,14 +10,14 @@ const parser = new ArgumentParser({
   description: 'A backup tool for various art websites.',
 });
 
-const subparsers = parser.addSubparsers({title: 'source', dest: 'source'});
+const subparsers = parser.add_subparsers({title: 'source', dest: 'source'});
 
 for (const module of modules) {
-  const subparser = subparsers.addParser(module.name);
+  const subparser = subparsers.add_parser(module.name);
   module.setupParser(subparser); 
 }
 
-const options = parser.parseArgs();
+const options = parser.parse_args();
 
 for (const module of modules) {
   if (module.name === options.source) {

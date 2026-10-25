@@ -5,5 +5,7 @@
   "helpers": [
     "src/helpers/**/*.ts"
   ],
-  "random": false
+  "env": {
+    "random": false
+  }
 }
