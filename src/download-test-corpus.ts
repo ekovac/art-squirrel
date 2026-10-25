@@ -1,6 +1,7 @@
 import path from 'path';
 import {writeFile} from 'node:fs/promises';
 import {USER_AGENT} from './user-agent';
+import {throwIfCloudflareChallenge} from './cloudflare';
 
 const OUTPUT_DIRECTORY = 'test_data';
 const CORPUS = {
@@ -16,7 +17,10 @@ const CORPUS = {
 const downloadCorpusEntry = ([outputName, url]: [string, string]) => {
   const outputFile = path.join(OUTPUT_DIRECTORY, outputName + '.html');
   return fetch(url, {headers: {'User-Agent': USER_AGENT}})
-      .then((res: Response) => res.arrayBuffer())
+      .then((res: Response) => {
+        throwIfCloudflareChallenge(res);
+        return res.arrayBuffer();
+      })
       .then((arrayBuffer: ArrayBuffer) =>
                 writeFile(outputFile, Buffer.from(arrayBuffer)));
 };

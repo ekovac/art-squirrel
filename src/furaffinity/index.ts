@@ -15,6 +15,10 @@ import { ArgumentParser } from "argparse";
 import { readdir, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { USER_AGENT } from "../user-agent";
+import {
+  CloudflareChallengeError,
+  throwIfCloudflareChallenge,
+} from "../cloudflare";
 
 export function setupParser(parser: ArgumentParser) {
   parser.add_argument("-c", "--cookies", {
@@ -70,6 +74,7 @@ async function getFavoritesPage(
   options: RequestInit,
 ): Promise<FavoritesPage> {
   const response = await fetch(uri, options);
+  throwIfCloudflareChallenge(response);
   const pageContent = await response.text();
   return scrapeFavoritesPage(pageContent);
 }
@@ -80,6 +85,7 @@ async function getSubmissionPage(
 ): Promise<SubmissionPage> {
   const uri = url.resolve(BASE_URL, `/view/${id}/`);
   const response = await fetch(uri, options);
+  throwIfCloudflareChallenge(response);
   const pageContent = await response.text();
   const submissionPage = await scrapeSubmissionPage(pageContent);
   submissionPage.sourceUrl = uri;
@@ -199,6 +205,7 @@ export const executeFetch = async (options: any) => {
         requestOptions,
       )
         .then((response) => {
+          throwIfCloudflareChallenge(response);
           if (response.status !== 200) {
             throw Error(
               `Failed to download submission ${submissionId}: HTTP ${response.status}`,
@@ -231,6 +238,9 @@ export const executeFetch = async (options: any) => {
             writeFile(downloadOutputPath, data);
           },
           (reason) => {
+            if (reason instanceof CloudflareChallengeError) {
+              throw reason;
+            }
             console.error(reason);
           },
         );
