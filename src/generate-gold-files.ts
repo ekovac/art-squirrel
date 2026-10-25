@@ -1,7 +1,7 @@
 import {scrapePage as scrapeFavorites} from './furaffinity/favorites-page';
 import {scrapePage as scrapeSubmission} from './furaffinity/submission-page';
-const fs = require('fs-extra');
-const path = require('path');
+import path from 'path';
+import {readFile, writeFile} from 'node:fs/promises';
 
 const OUTPUT_DIRECTORY = 'test_data';
 const fileNames = [
@@ -33,12 +33,12 @@ const generateGoldFile = (fileName: string) => {
   const filePath = path.join(OUTPUT_DIRECTORY, fileName + '.html');
   const jsonPath = path.join(OUTPUT_DIRECTORY, fileName + '.json');
   if (scraper) {
-    return fs.promises.readFile(filePath, {encoding: 'utf-8'})
+    return readFile(filePath, {encoding: 'utf-8'})
         .then(scraper)
         .then((output: {[key: string]: any}) => JSON.stringify(output, null, 2))
         .then(
             (outputString: string) =>
-                fs.promises.writeFile(jsonPath, outputString));
+                writeFile(jsonPath, outputString));
   } else {
     return undefined;
   }

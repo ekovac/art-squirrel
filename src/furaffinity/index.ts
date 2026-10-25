@@ -14,6 +14,7 @@ export { SubmissionPage } from "./submission-page";
 import { ArgumentParser } from "argparse";
 import { readdir, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
+import { USER_AGENT } from "../user-agent";
 
 export function setupParser(parser: ArgumentParser) {
   parser.add_argument("-c", "--cookies", {
@@ -148,7 +149,10 @@ export const executeFetch = async (options: any) => {
     );
 
     const requestOptions: RequestInit = {
-      headers: { Cookie: `a=${cookies.a};b=${cookies.b};s=1` },
+      headers: {
+        Cookie: `a=${cookies.a};b=${cookies.b};s=1`,
+        "User-Agent": USER_AGENT,
+      },
     };
 
     for await (const submissionId of getFavoritesIds(
